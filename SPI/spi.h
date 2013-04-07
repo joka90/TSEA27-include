@@ -1,8 +1,12 @@
 #ifndef SPI_H
 #define SPI_H
 
+#include <avr/interrupt.h>
+
 //exchange databit 
 #define CMD_EXCHANGE_DATA        0xE0 // 111 0 0000
+
+#define SPI_BUFFERSIZE        	 16 // 111 0 0000
 
 #ifdef CONFIG_SPI_MASTER
 /*
