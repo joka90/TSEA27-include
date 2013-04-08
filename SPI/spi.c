@@ -144,20 +144,20 @@ Returnerar 0 för fel, 1 för lyckad sparning.
 */
 uint8_t SPI_SLAVE_write(uint8_t *msg, uint8_t len)
 {
-//får paketet plats
-if(len+1 > SPI_BUFFERSIZE-tx_size)
-{
-    return 0;
-}
-//stoppa in paket i tx buffern
-uint8_t i = 0;
+    //får paketet plats
+    if(len+1 > SPI_BUFFERSIZE-tx_size)
+    {
+        return 0;
+    }
+    //stoppa in paket i tx buffern
+    uint8_t i = 0;
 
-while(i =< len)
-{
-    circularBufferAdd(txbuffer, msg[i], tx_end, tx_size, SPI_BUFFERSIZE);
-    i = i + 1;
-}
-return 1;
+    while(i =< len)
+    {
+        circularBufferAdd(txbuffer, msg[i], tx_end, tx_size, SPI_BUFFERSIZE);
+        i = i + 1;
+    }
+    return 1;
 
 
 /*
@@ -176,8 +176,8 @@ paketet. Returnerar 0 för fel (om buffern var tom), 1 för lyckad läsning
 uint8_t SPI_SLAVE_read(uint8_t *msg, uint8_t *len)
 {
     *len = circularBufferRead(rxbuffer, rx_start, rx_size, SPI_BUFFERSIZE);
-    msg[0] = *len
-    *len = *len&0x07;
+    msg[0] = *len;
+    *len = *len&0x1f;
     uint8_t i = 0;
     if(rx_size < *len)
     {
