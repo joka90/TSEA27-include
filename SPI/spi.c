@@ -10,8 +10,9 @@ void SPI_MASTER_init(void)
 	DDR_SPI = (1<<DD_MOSI)|(1<<DD_SCK);
 	/* Enable SPI, Master, set clock rate fck/16 */
 	SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0);
-// fixa SÅ SS ÄR output annatrs buggar det, då den vill byta till slav
-// initera styrportarna här också?
+	//ställ in SS
+	PORTB |= (1<<PB4)|(1<<PB3);// sätt båda slavarna höga
+	DDRB |= (1<<DDB4)|(1<<DDB3);
 }
 
 
@@ -58,11 +59,29 @@ uint8_t SPI_MASTER_read(uint8_t *msg, uint8_t *len)
 
 /*
 Väljer enhet som skall vara aktiv på bussen. Denna funktion kommer endast att finnas på styrenheten som är
-master. Styrpinnar för slaveselect kommer vara hårdkodat. Returnerar 0 för fel, 1 för lyckad sparning.
+master. Styrpinnar för slaveselect kommer vara hårdkodat. 
 */
-uint8_t SPI_select_unit(uint8_t unit)
+void SPI_set_kom(uint8_t t)
 {
+	if(t==START)
+	{
+		PORTB |= (0<<PB4);
+	}
+	else
+		PORTB |= (1<<PB4);
+	}
+}
 
+void SPI_set_sensor(uint8_t t)
+{
+	if(t==START)
+	{
+		PORTB |= (0<<PB3);
+	}
+	else
+	{
+		PORTB |= (1<<PB3);
+	}
 }
 
 

@@ -9,6 +9,10 @@
 #define SPI_BUFFERSIZE        	 16 // 111 0 0000
 
 #ifdef CONFIG_SPI_MASTER
+
+#define START 1 
+#define END 0 
+
 /*
 Ställer in alla register för att agera som master.
 */
@@ -26,9 +30,10 @@ uint8_t SPI_MASTER_read(uint8_t *msg, uint8_t *len);
 
 /*
 Väljer enhet som skall vara aktiv på bussen. Denna funktion kommer endast att finnas på styrenheten som är
-master. Styrpinnar för slaveselect kommer vara hårdkodat. Returnerar 0 för fel, 1 för lyckad sparning.
-*/
-uint8_t SPI_select_unit(uint8_t unit);
+master. Styrpinnar för slaveselect kommer vara hårdkodat. */
+void SPI_set_kom(uint8_t t);
+void SPI_set_sensor(uint8_t t);
+
 
 #endif 
 

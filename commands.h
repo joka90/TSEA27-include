@@ -17,4 +17,7 @@
 #define CMD_STYR_CHANGE_PARM     0x40 // 010 0 0000
 #define CMD_STYR_NO_PC_MESSAGES  0x60 // 011 0 0000
 
+#define START 1 
+#define END 0 
+
 #endif
