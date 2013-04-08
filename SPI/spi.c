@@ -1,8 +1,6 @@
-#ifdef CONFIG_SPI_MASTER
-
 #include "spi.h"
 
-/*
+#ifdef CONFIG_SPI_MASTER/*
 Ställer in alla register för att agera som master.
 */
 void SPI_MASTER_init(void)
@@ -68,7 +66,7 @@ uint8_t SPI_select_unit(uint8_t unit)
 }
 
 
-#endif 
+#endif
 
 #ifdef CONFIG_SPI_SLAVE
 
@@ -78,10 +76,54 @@ uint8_t current_len;
 volatile uint8_t t txbuffer[SPI_BUFFERSIZE];// volatile because read in interupt and in main program.,
 volatile uint8_t  tx_start;
 volatile uint8_t  tx_end;
+volatile uint8_t  tx_size;
 volatile uint8_t  rxbuffer[SPI_BUFFERSIZE];
 volatile uint8_t  rx_start;
 volatile uint8_t  rx_end;
+volatile uint8_t  rx_size;
 
+void circularBufferAdd(volatile uint8_t* buffer, uint8_t element, volatile uint8_t& end, volatile uint8_t& size, uint8_t SIZE)
+{
+    buffer[end] = element;
+    if(end == SIZE)
+    {
+        end = 0;
+    }
+    else
+    {
+        end = end+1;
+    }
+    size = size +1;
+}
+
+uint8_t circularBufferRead(volatile uint8_t* buffer, volatile uint8_t& start, volatile uint8_t& size, uint8_t SIZE)
+{
+    uint8_t ret = buffer[start];
+    if(start == SIZE)
+    {
+        start = 0;
+    }
+    else
+    {
+        start = start+1;
+    }
+    size = size - 1;
+    return ret;
+}
+
+void circularBufferPutBack(volatile uint8_t* buffer, uint8_t element, volatile uint8_t& start, volatile uint8_t& size, uint8_t SIZE)
+{
+    if(start == 0)
+    {
+        start = SIZE;
+    }
+    else
+    {
+        start = start-1;
+    }
+    buffer[start] = element;
+    size = size + 1;
+}
 
 /*
 Ställer in alla register för att agera som slave.
@@ -102,10 +144,23 @@ Returnerar 0 för fel, 1 för lyckad sparning.
 */
 uint8_t SPI_SLAVE_write(uint8_t *msg, uint8_t len)
 {
+//får paketet plats
+if(len > SPI_BUFFERSIZE-tx_size)
+{
+    return 0;
+}
+//stoppa in paket i tx buffern
+uint8_t i = 0;
+
+while(i < len)
+{
+    circularBufferAdd(txbuffer, msg[i], tx_end, tx_size, SPI_BUFFERSIZE);
+    i = i + 1;
+}
+return 1;
+
+
 /*
-
-stoppa in paket i tx buffern
-
 Hållar reda på lite pekare osv på för skrivning. så att den inte skriver över saker. signalera om buffer full.
 
 tx_end+len, pekar på nästa lediga plats.
@@ -120,10 +175,23 @@ paketet. Returnerar 0 för fel (om buffern var tom), 1 för lyckad läsning
 */
 uint8_t SPI_SLAVE_read(uint8_t *msg, uint8_t *len)
 {
-	if(start+len<end)
-	{}
+    *len = circularBufferRead(rxbuffer, rx_start, rx_size, SPI_BUFFERSIZE);
+    msg[0] = *len
+    *len = *len&0x07;
+    uint8_t i = 0;
+    if(rx_size < *len)
+    {
+        circularBufferPutBack(rxbuffer, msg[0], rx_start, rx_size, SPI_BUFFERSIZE);
+        return 0;
+    }
+    while(i < *len)
+    {
+        msg[i+1] = circularBufferRead(rxbuffer, rx_start, rx_size, SPI_BUFFERSIZE);
+        i = i + 1;
+    }
+    return 1;
 /*
-
+TODO
 läs ut ett paket ur rx buffern
 
 Hållar reda på lite pekare osv på för läsning. så att den inte skriver över saker. signalera om buffer full.
@@ -141,51 +209,28 @@ ISR(SPI_STC_vect)
 		{
 		    recv_mode=0;
 		}
-
+        circularBufferAdd(rxbuffer, SPDR, rx_end, rx_size, SPI_BUFFERSIZE);
 		//STOPPA byten in i SPI-RX-buffer(på  rx_end), uppdatera rx_end+len
-	
+	//TODO
 
 	}
-	else
-	{
-		if(SPDR==CMD_EXCHANGE_DATA)
+	else if(SPDR==CMD_EXCHANGE_DATA)
+    {
+        SPDR = circularBufferRead(txbuffer, tx_start, tx_size, SPI_BUFFERSIZE);
+    }
+    else
+    {
+        //new recive
+        recv_mode=1;
+        //läs ur längden ur byten, uppdatera räknaren.
+        current_packet_len=0b00011111&SPDR;//klipp bort typ
+        current_len=0;
+        if(current_len==current_packet_len)
 		{
-		    //send from tx-buffer(läs från tx start.) Uppdatera tx-start med +1
-			if(tx_start+current_len<SPI_BUFFERSIZE)
-			{
-				SPDR = txbuffer[tx_start+current_len];
-			}
-			else
-			{
-				SPDR = txbuffer[tx_start+current_len-SPI_BUFFERSIZE];// TODO
-			}
+		    recv_mode=0;
 		}
-		else
-		{
-			//new recive
-			recv_mode=1;
-			//läs ur längden ur byten, uppdatera räknaren.
-			current_packet_len=0b00011111&SPDR;//klipp bort typ
-			current_len=0;
-
-			//STOPPA byten in i SPI-RX-buffen SAMMA KOD PÅ TVÅ STÄLLEN
-			if(rx_start+current_len < rx_end)
-			{
-				rxbuffer[rx_start+current_len];
-				//send confirm
-				SPDR = OK; // om full eller inte?
-			}
-			else if(rx_start+current_len>SPI_BUFFERSIZE)
-			{
-				if(rx_start+current_len-SPI_BUFFERSIZE < rx_end)
-				{
-					rxbuffer[rx_start+current_len-SPI_BUFFERSIZE];// TODO tänk igen, känns rätt
-					//send confirm
-					SPDR = OK; // om full eller inte?
-				}
-			}
-
-		}
+        //STOPPA byten in i SPI-RX-buffen TODO
+        circularBufferAdd(rxbuffer, SPDR, rx_end, rx_size, SPI_BUFFERSIZE);
 	}
 }
 
