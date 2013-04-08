@@ -145,14 +145,14 @@ Returnerar 0 för fel, 1 för lyckad sparning.
 uint8_t SPI_SLAVE_write(uint8_t *msg, uint8_t len)
 {
 //får paketet plats
-if(len > SPI_BUFFERSIZE-tx_size)
+if(len+1 > SPI_BUFFERSIZE-tx_size)
 {
     return 0;
 }
 //stoppa in paket i tx buffern
 uint8_t i = 0;
 
-while(i < len)
+while(i =< len)
 {
     circularBufferAdd(txbuffer, msg[i], tx_end, tx_size, SPI_BUFFERSIZE);
     i = i + 1;
@@ -229,7 +229,6 @@ ISR(SPI_STC_vect)
 		{
 		    recv_mode=0;
 		}
-        //STOPPA byten in i SPI-RX-buffen TODO
         circularBufferAdd(rxbuffer, SPDR, rx_end, rx_size, SPI_BUFFERSIZE);
 	}
 }
