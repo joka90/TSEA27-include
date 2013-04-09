@@ -24,9 +24,16 @@ uint8_t UART_read(uint8_t *msg, uint8_t *len)
 /*
 Ställer in alla register samt hastighet för porten.
 */
-void UART_init()
+void UART_Init( unsigned int baud )
 {
-
+	/* Set baud rate to 115200*/
+	unsigned int baud = 
+	UBRRH = (unsigned char)(baud>>8);
+	UBRRL = (unsigned char)baud;
+	/* Enable receiver and transmitter */
+	UCSRB = (1<<RXEN)|(1<<TXEN);
+	/* Set frame format: 8data, 2stop bit */
+	UCSRC = (1<<URSEL)|(1<<USBS)|(3<<UCSZ0);
 }
 
 
