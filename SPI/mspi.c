@@ -1,26 +1,35 @@
 /*
 Ställer in alla register för att agera som master.
 */
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+#include "mspi.h"
+
 void MSPI_init_master()
 {
-
+	UBRR1 = 0;
+	/* Setting the XCKn port pin as output, enables master mode. */
+	DDRD = 0b00010110;
+	//XCKn_DDR |= (1<<XCKn);
+	/* Set MSPI mode of operation and SPI data mode 0. */
+	UCSR1C = (1<<UMSEL11)|(1<<UMSEL10)|(0<<UCPOL1)|(0<<U2X1)|(0<<2);
+	/* Enable receiver and transmitter. */
+	UCSR1B = (1<<RXEN1)|(1<<TXEN1);
+	/* Set baud rate. */
+	/* IMPORTANT: The Baud Rate must be set after the transmitter is enabled
+	*/
+	UBRR1 = 0;
 }
 
-/*
-Sparar ovanstående på skrivbuffern samt startar skrivningen vilken upphör när hela buffern skrivit klart.
-Returnerar 0 för fel, 1 för lyckad sparning.
-*/
-uint8_t MSPI_write(uint8_t *msg, uint8_t len)
+uint8_t MSPI_exchange(uint8_t data)
 {
-
-}
-
-
-/*
-Läser in nästa datapaket från buffern och sparar det i msg, samt dess längd i len. len sparas i bit 5 till 7 i paketet.
-Returnerar 0 för fel, 1 för lyckad läsning.
-*/
-uint8_t MSPI_read(uint8_t *msg, uint8_t *len)
-{
-
+	/* Wait for empty transmit buffer */
+	while ( !( UCSR1A & (1<<UDRE1)) );
+	/* Put data into buffer, sends the data */
+	UDR1 = data;
+	/* Wait for data to be received */
+	while ( !(UCSR1A & (1<<RXC1)) );
+	/* Get and return received data from buffer */
+	return UDR1;
 }
