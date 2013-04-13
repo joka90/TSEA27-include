@@ -8,7 +8,7 @@
 /*
 Ställer in alla register samt hastighet för porten.
 */
-void UART_Init()
+void UART_init()
 {
 	/// SÄTT UPP USART
 	
@@ -43,6 +43,13 @@ void UART_writeMessage(uint8_t msg[])
 		UDR0 = msg[i];
 	}
 }
+
+/*
+Returnerar 1 om det finns ett eller flera meddelanden mottagna, annars 0.
+*/
+uint8_t UART_hasMessage(){
+	return (_noOfMessagesInBuffer>0);
+}	
 
 /*
 Läser in nästa datapaket från buffern och sparar det i msg, samt dess längd i len. len sparas i bit 5 till 7 i paketet.

@@ -19,6 +19,11 @@ Returnerar 0 för fel, 1 för lyckad sparning.
 uint8_t UART_writeMessage(uint8_t msg[]);
 
 /*
+Returnerar 1 om det finns ett eller flera meddelanden mottagna, annars 0.
+*/
+uint8_t UART_hasMessage();
+
+/*
 Läser in nästa datapaket från buffern och sparar det i msg, samt dess längd i len. len sparas i bit 5 till 7 i paketet.
 Returnerar 0 för fel (om buffern var tom), 1 för lyckad läsning.
 */
