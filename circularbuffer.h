@@ -18,9 +18,15 @@ void cbInit(CircularBuffer *cb, uint8_t size);
 
 void cbFree(CircularBuffer *cb);
 
-int cbIsFull(CircularBuffer *cb);
+uint8_t cbIsFull(CircularBuffer *cb);
 
-int cbIsEmpty(CircularBuffer *cb);
+uint8_t cbIsEmpty(CircularBuffer *cb);
+
+uint8_t cbBytesUsed(CircularBuffer *cb);
+
+uint8_t cbBytesFree(CircularBuffer *cb);
+
+uint8_t cbPeek(CircularBuffer *cb);
 
 /* Write an element, overwriting oldest element if buffer is full. App can
    choose to avoid the overwrite by checking cbIsFull(). */

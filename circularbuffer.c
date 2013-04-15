@@ -15,11 +15,11 @@ void cbFree(CircularBuffer *cb) {
     free(cb->bytes); /* OK if null */
 }
  
-int cbIsFull(CircularBuffer *cb) {
+uint8_t cbIsFull(CircularBuffer *cb) {
     return (cb->bytesUsed == cb->size);
 }
  
-int cbIsEmpty(CircularBuffer *cb) {
+uint8_t cbIsEmpty(CircularBuffer *cb) {
     return (cb->bytesUsed == 0); 
 }
 
