@@ -37,6 +37,9 @@
 #define IDSPEEDRIGHT 0x09
 #define IDSPEEDLEFT 0x0a
 
+#define PARAMLEFTCUSTOM 0x00
+#define PARAMRIGHTCUSTOM 0x01
+
 #define START 1 
 #define END 0 
 
