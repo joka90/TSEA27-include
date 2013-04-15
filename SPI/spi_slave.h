@@ -26,6 +26,6 @@ uint8_t SPI_SLAVE_write(uint8_t *msg, uint8_t type, uint8_t len);
 Läser in nästa meddelande från buffern och sparar det i msg, samt dess längd i len. len sparas i bit 5 till 7 i
 paketet. Returnerar 0 för fel (om buffern var tom), 1 för lyckad läsning
 */
-uint8_t SPI_SLAVE_read(uint8_t *msg, uint8_t *len);
+uint8_t SPI_SLAVE_read(uint8_t *msg, uint8_t* type, uint8_t *len);
 
 #endif
