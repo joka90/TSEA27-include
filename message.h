@@ -19,6 +19,18 @@
 #define TYPE_NO_PC_MESSAGES		 0x03 // 011
 #define TYPE_EMERGENCY_STOP		 0x04 // 100
 
+#define IDSENSOR1 0x00
+#define IDSENSOR2 0x01
+#define IDSENSOR3 0x02
+#define IDSENSOR4 0x03
+#define IDSENSOR5 0x04
+#define IDSENSOR6 0x05
+#define IDSENSOR7 0x06
+#define IDSENSOR8 0x07
+#define IDGYROSENSOR 0x08
+#define IDSPEEDRIGHT 0x09
+#define IDSPEEDLEFT 0x0a
+
 #define START 1 
 #define END 0 
 
