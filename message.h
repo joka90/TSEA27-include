@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 //exchange databit 
-#define CMD_EXCHANGE_DATA        0x07 // 111
+#define TYPE_CMD_EXCHANGE_DATA        0x07 // 111
 
 //styr skicka
 #define TYPE_REQUEST_SENSOR_DATA 0x00 // 000
