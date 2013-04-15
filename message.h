@@ -25,7 +25,7 @@
 /*
  Skapar ett meddelande (msg) från en given typ (type) och given parameterarray (param)
 */
-void createMessage(uint8_t *msg, uint8_t type, uint8_t *param);
+void createMessage(uint8_t* msg, uint8_t type, uint8_t* param, uint8_t param_size);
 
 /*
  Returnerar meddelandets typ
