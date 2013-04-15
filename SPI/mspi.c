@@ -9,8 +9,8 @@ Ställer in alla register för att agera som master.
 void MSPI_init_master()
 {
 	UBRR1 = 0;
-	/* Setting the XCKn port pin as output, enables master mode. */
-	DDRD = 0b00010110;
+	/* Setting the XCKn port pin as output, enables master mode. PD2 as SS output*/
+	DDRD = 0b00010110|(1<<PD2);
 	//XCKn_DDR |= (1<<XCKn);
 	/* Set MSPI mode of operation and SPI data mode 0. */
 	UCSR1C = (1<<UMSEL11)|(1<<UMSEL10)|(0<<UCPOL1)|(0<<U2X1)|(0<<2);
