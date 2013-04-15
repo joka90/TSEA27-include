@@ -78,30 +78,22 @@ void SPI_SLAVE_init()
 Sparar ovanstående på skrivbuffern samt startar skrivningen vilken upphör när hela buffern skrivit klart.
 Returnerar 0 för fel, 1 för lyckad sparning.
 */
-uint8_t SPI_SLAVE_write(uint8_t *msg, uint8_t len)
+uint8_t SPI_SLAVE_write(uint8_t *msg, uint8_t type, uint8_t len)
 {
 	//får paketet plats
-	if(len+1 > SPI_BUFFERSIZE-tx_size)
+	if(len+2 > SPI_BUFFERSIZE-tx_size)
 	{
 		return 0;
 	}
+	circularBufferAdd(txbuffer, (type<<5)||len, &tx_end, &tx_size, SPI_BUFFERSIZE);//add header
 	//stoppa in paket i tx buffern
 	uint8_t i = 0;
-
 	while(i < len)
 	{
 		circularBufferAdd(txbuffer, msg[i], &tx_end, &tx_size, SPI_BUFFERSIZE);
 		i = i + 1;
 	}
 	return 1;
-
-
-	/*
-	Hållar reda på lite pekare osv på för skrivning. så att den inte skriver över saker. signalera om buffer full.
-
-	tx_end+len, pekar på nästa lediga plats.
-
-	*/
 }
 
 
@@ -109,31 +101,32 @@ uint8_t SPI_SLAVE_write(uint8_t *msg, uint8_t len)
 Läser in nästa meddelande från buffern och sparar det i msg, samt dess längd i len. len sparas i bit 5 till 7 i
 paketet. Returnerar 0 för fel (om buffern var tom), 1 för lyckad läsning
 */
-uint8_t SPI_SLAVE_read(uint8_t *msg, uint8_t *len)
+uint8_t SPI_SLAVE_read(uint8_t *msg, uint8_t* type, uint8_t *len)
 {
 	if(rx_size == 0)
 	{
 		return 0;
 	}
 	*len = circularBufferRead(rxbuffer, &rx_start, &rx_size, SPI_BUFFERSIZE);
-	msg[0] = *len;
+	*type=0b11100000&*len;
+	*type = *type>>5;
 	*len = *len&0x1f;
-	uint8_t i = 0;
+	
 	if(rx_size < *len)
 	{
 		circularBufferPutBack(rxbuffer, msg[0], &rx_start, &rx_size, SPI_BUFFERSIZE);
 		return 0;
 	}
+	uint8_t i = 0;
 	while(i <= *len)
 	{
-		msg[i+1] = circularBufferRead(rxbuffer, &rx_start, &rx_size, SPI_BUFFERSIZE);
-		i = i + 1;
+		msg[i] = circularBufferRead(rxbuffer, &rx_start, &rx_size, SPI_BUFFERSIZE);
+		i++;
 	}
 	return 1;
 	/*
-	TODO
 	läs ut ett paket ur rx buffern
-
+	
 	Hållar reda på lite pekare osv på för läsning. så att den inte skriver över saker. signalera om buffer full.
 	rx_start+len pekar på nästa paket efter vi läst ut ett.
 

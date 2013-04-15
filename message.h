@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 //exchange databit 
-#define CMD_EXCHANGE_DATA        0xE0 // 111 0 0000
+#define TYPE_CMD_EXCHANGE_DATA        0x07 // 111
 
 //styr skicka
 #define TYPE_REQUEST_SENSOR_DATA 0x00 // 000
@@ -19,6 +19,11 @@
 #define TYPE_NO_PC_MESSAGES		 0x03 // 011
 #define TYPE_EMERGENCY_STOP		 0x04 // 100
 
+//sensor taemot
+#define TYPE_REQUEST_SENSOR_DATA 0x00 // 000
+
+//sensor skicka
+#define TYPE_REPLY_SENSOR_DATA   0x00 // 000
 #define IDSENSOR1 0x00
 #define IDSENSOR2 0x01
 #define IDSENSOR3 0x02
