@@ -13,11 +13,11 @@ void UART_init()
 	/// SÄTT UPP USART
 	
 	/* Set baud rate */
-	unsigned char baud = 51;
+	unsigned char baud = 99;//63;
 	UBRR0H = (unsigned char)(baud>>8);
 	UBRR0L = (unsigned char)baud;
 	/* Enable receiver and transmitter, and enable interrupts on receiving */
-	UCSR0B = (1<<RXEN0)|(1<<TXEN0);//|(1<<RXCIE0);
+	UCSR0B = (1<<RXEN0)|(1<<TXEN0)|(1<<RXCIE0);
 	/* Set frame format: 8data, 1stop bit */
 	UCSR0C = (0<<USBS0)|(3<<UCSZ00);
 	
@@ -27,14 +27,21 @@ void UART_init()
 	_noOfMessagesInBuffer = 0;
 	_remainingBytes = 0;
 	
+	/// Skicka Handshake ( FF FF )
+	
+	uint8_t handshake[2];
+	handshake[0] = 0xFF;
+	handshake[1] = 0xFF;
+	UART_writeMessage(handshake, 2);
+	
 	sei();
 }
 /*
 Skickar meddelandet som ges av msg, byte för byte.
 */
-void UART_writeMessage(uint8_t msg[])
+void UART_writeMessage(uint8_t* msg, uint8_t size)
 {
-	for(int i = 0; i<sizeof(msg); i++){
+	for(int i = 0; i<size; i++){
 		
 		/* Wait for empty transmit buffer */
 		while ( !( UCSR0A & (1<<UDRE0)));
@@ -55,18 +62,17 @@ uint8_t UART_hasMessage(){
 Läser in nästa datapaket från buffern och sparar det i msg, samt dess längd i len. len sparas i bit 5 till 7 i paketet.
 Returnerar 0 för fel (om buffern var tom), 1 för lyckad läsning.
 */
-uint8_t UART_readMessage(uint8_t *msg)
-{	
+uint8_t UART_readMessage(uint8_t *msg, uint8_t *length)
+{
 	if(_noOfMessagesInBuffer==0)
 		return 0;
 	
 	uint8_t firstByte = cbRead(&_rxMessageBuffer);
-	uint8_t length = firstByte&0x1F;
+	*length = firstByte&0x1F;
 	
-	msg = (uint8_t*)malloc(length+1);
 	msg[0] = firstByte;
 	
-	for(int i = 1;i<=length;i++){
+	for(int i = 1;i<=*length;i++){
 		msg[i] = cbRead(&_rxMessageBuffer);
 	}
 	
