@@ -24,6 +24,7 @@
 
 //sensor skicka
 #define TYPE_REPLY_SENSOR_DATA   0x00 // 000
+
 #define IDSENSOR1 0x00
 #define IDSENSOR2 0x01
 #define IDSENSOR3 0x02
