@@ -37,8 +37,18 @@
 #define IDSPEEDRIGHT 0x09
 #define IDSPEEDLEFT 0x0a
 
+//reglerparam
 #define PARAMLEFTCUSTOM 0x00
 #define PARAMRIGHTCUSTOM 0x01
+
+//styrkommandon
+#define FORWARD_COMMAND 0
+#define RIGHT_90_COMMAND 1
+#define LEFT_90_COMMAND 2
+#define RIGHT_45_COMMAND 3
+#define LEFT_45_COMMAND 4
+#define VIRTUAL_REVERSE_COMMAND 5
+#define CUSTOM_STEERING_COMMAND 6
 
 #define START 1 
 #define END 0 
