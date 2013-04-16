@@ -28,23 +28,28 @@ void UART_init()
 	_remainingBytes = 0;
 	
 	/// Skicka Handshake ( FF FF )
-	
-	uint8_t handshake[2];
-	handshake[0] = 0xFF;
-	handshake[1] = 0xFF;
-	UART_writeMessage(handshake, 2);
-	
-	sei();
+	for(int i = 0; i < 2; i++){	
+		/* Wait for empty transmit buffer */
+		while (!( UCSR0A & (1<<UDRE0)));
+		/* Put data into buffer, sends the data */
+		UDR0 = 0xFF;
+	}
 }
 /*
 Skickar meddelandet som ges av msg, byte för byte.
 */
-void UART_writeMessage(uint8_t* msg, uint8_t size)
+void UART_writeMessage(uint8_t* msg, uint8_t type, uint8_t size)
 {
-	for(int i = 0; i<size; i++){
+	/* Wait for empty transmit buffer */
+	while (!( UCSR0A & (1<<UDRE0)));
+			
+	/* Put data into buffer, sends the data */
+	UDR0 = (type<<5)||size;//header data
+	
+	for(int i = 0; i < size; i++){
 		
 		/* Wait for empty transmit buffer */
-		while ( !( UCSR0A & (1<<UDRE0)));
+		while (!( UCSR0A & (1<<UDRE0)));
 		
 		/* Put data into buffer, sends the data */
 		UDR0 = msg[i];
@@ -62,19 +67,21 @@ uint8_t UART_hasMessage(){
 Läser in nästa datapaket från buffern och sparar det i msg, samt dess längd i len. len sparas i bit 5 till 7 i paketet.
 Returnerar 0 för fel (om buffern var tom), 1 för lyckad läsning.
 */
-uint8_t UART_readMessage(uint8_t *msg, uint8_t *length)
+uint8_t UART_readMessage(uint8_t *msg, uint8_t *type, uint8_t *length)
 {
 	if(_noOfMessagesInBuffer==0)
 		return 0;
 	
 	uint8_t firstByte = cbRead(&_rxMessageBuffer);
+	*type=0b11100000&firstByte;
+	*type = *type>>5;
 	*length = firstByte&0x1F;
 	
-	msg[0] = firstByte;
-	
-	for(int i = 1;i<=*length;i++){
+	for(int i = 0; i < *length; i++){
 		msg[i] = cbRead(&_rxMessageBuffer);
 	}
+	
+	
 	
 	return 1;
 }
@@ -106,6 +113,7 @@ ISR(USART0_RX_vect){
 		
 	}else{
 		// rx-bufferten är full, vad göra?
+		// ändra pinne så att det inte går att skicka? /Johan
 	}
 }
 

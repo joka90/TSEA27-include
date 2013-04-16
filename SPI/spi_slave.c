@@ -118,7 +118,7 @@ uint8_t SPI_SLAVE_read(uint8_t *msg, uint8_t* type, uint8_t *len)
 		return 0;
 	}
 	uint8_t i = 0;
-	while(i <= *len)
+	while(i < *len)
 	{
 		msg[i] = circularBufferRead(rxbuffer, &rx_start, &rx_size, SPI_BUFFERSIZE);
 		i++;
