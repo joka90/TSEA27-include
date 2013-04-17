@@ -75,7 +75,6 @@ void SPI_set_kom(uint8_t t)
 	if(t==START)
 	{
 		PORTB &= ~(1<<PB4);
-		
 	}
 	else
 	{
