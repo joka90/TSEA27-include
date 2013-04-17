@@ -1,14 +1,13 @@
-//// PRIVATA (INTERNA) VARIABLER
-////   -Används ej utanför uart.c
-#include "../circularbuffer.h"
-
-CircularBuffer _rxMessageBuffer; // Buffer för mottagna meddelanden
-uint8_t _noOfMessagesInBuffer; // Antalet hela meddelanden i _rxMessageBuffer
-uint8_t _remainingBytes; // Anger antalet återstående bytes som ännu inte läst in, i ett meddelande som håller på att tas emot
-
 #ifndef UART_H
 #define UART_H
 
+#include "../circularbuffer.h"
+
+//// PRIVATA (INTERNA) VARIABLER
+////   -Används ej utanför uart.c
+CircularBuffer _rxMessageBuffer; // Buffer för mottagna meddelanden
+uint8_t _noOfMessagesInBuffer; // Antalet hela meddelanden i _rxMessageBuffer
+uint8_t _remainingBytes; // Anger antalet återstående bytes som ännu inte läst in, i ett meddelande som håller på att tas emot
 
 //// PUBLIKA FUNKTIONER
 
