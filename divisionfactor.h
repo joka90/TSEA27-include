@@ -1,4 +1,4 @@
-#ifndef DIVISIONFACTOR_H
+﻿#ifndef DIVISIONFACTOR_H
 #define DIVISIONFACTOR_H
 /**
 * Denna fil är till för att spara konstanter som används för att optimera upplösningen i en byte.
@@ -10,5 +10,6 @@
 */
 #define DIVFAC_ROTSENSOR 2
 
+#define DIVFAC_DISTSHORTSENSOR 2
 
 #endif
