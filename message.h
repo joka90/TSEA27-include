@@ -20,9 +20,11 @@
 
 //sensor taemot
 #define TYPE_REQUEST_SENSOR_DATA 0x00 // 000
+#define TYPE_CALIBRATE_GYRO		 0x01 // 001
 
 //sensor skicka
 #define TYPE_REPLY_SENSOR_DATA   0x00 // 000
+#define TYPE_REPLY_CALIBRATE_GYRO 0x01 // 001
 
 #define LONGFRONT 0x00
 #define LONGRIGHT 0x01

@@ -17,6 +17,7 @@
 #define BITSCLEAR(x,y) (((x) & (y)) == 0)
 #define BITVAL(x,y) (((x)>>(y)) & 1)
 
-
+uint16_t filterSampleArrayMeanPlusPlus(volatile uint16_t  *samples, uint8_t numOfSamples, uint8_t threshold);
+uint16_t absThreshold(uint16_t a1, uint16_t a2);
 
 #endif
