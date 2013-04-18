@@ -21,8 +21,6 @@ void UART_init()
 	/// SÄTT UPP RX-BUFFER
 
 	cbInit(&_rxMessageBuffer, 100);
-	_noOfMessagesInBuffer = 0;
-	_remainingBytes = 0;
 	
 	/// Skicka Handshake ( FF FF )
 	for(int i = 0; i < 2; i++){	
@@ -53,12 +51,6 @@ void UART_writeMessage(uint8_t* msg, uint8_t type, uint8_t size)
 	}
 }
 
-/*
-Returnerar 1 om det finns ett eller flera meddelanden mottagna, annars 0.
-*/
-uint8_t UART_hasMessage(){
-	return (_noOfMessagesInBuffer>0);
-}	
 
 /*
 Läser in nästa datapaket från buffern och sparar det i msg, samt dess längd i len. len sparas i bit 5 till 7 i paketet.
@@ -66,8 +58,14 @@ Returnerar 0 för fel (om buffern var tom), 1 för lyckad läsning.
 */
 uint8_t UART_readMessage(uint8_t *msg, uint8_t *type, uint8_t *length)
 {
-	if(_noOfMessagesInBuffer==0)
+	//kolla om det finns några hela medelanden
+	if(cbBytesUsed(&_rxMessageBuffer)==0)
 		return 0;
+	uint8_t length_msg = cbPeek(&_rxMessageBuffer)&0x1f;
+	if(cbBytesUsed(&_rxMessageBuffer) < length_msg+1)
+	{
+		return 0;
+	}
 	
 	uint8_t firstByte = cbRead(&_rxMessageBuffer);
 	*type=0b11100000&firstByte;
@@ -96,17 +94,17 @@ ISR(USART0_RX_vect){
 		// Lägg till i bufferten
 		cbWrite(&_rxMessageBuffer, b);
 		
-		// Är denna byte är början på ett nytt meddelande?
-		if(_remainingBytes == 0){
-			
-			_remainingBytes = b&0x1F;
-			
-		}else{
-			_remainingBytes--;
-			// Om detta var sista byten i ett meddelande
-			if(_remainingBytes == 0)
-				_noOfMessagesInBuffer++;
-		}
+// 		// Är denna byte är början på ett nytt meddelande?
+// 		if(_remainingBytes == 0){
+// 			
+// 			_remainingBytes = b&0x1F;
+// 			
+// 		}else{
+// 			_remainingBytes--;
+// 			// Om detta var sista byten i ett meddelande
+// 			if(_remainingBytes == 0)
+// 				_noOfMessagesInBuffer++;
+// 		}
 		
 	}else{
 		// rx-bufferten är full, vad göra?
