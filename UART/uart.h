@@ -1,12 +1,11 @@
-//// PRIVATA (INTERNA) VARIABLER
-////   -Används ej utanför uart.c
-#include "../circularbuffer.h"
-
-CircularBuffer _rxMessageBuffer; // Buffer för mottagna meddelanden
-
 #ifndef UART_H
 #define UART_H
 
+#include "../circularbuffer.h"
+
+//// PRIVATA (INTERNA) VARIABLER
+////   -Används ej utanför uart.c
+CircularBuffer _rxMessageBuffer; // Buffer för mottagna meddelanden
 
 //// PUBLIKA FUNKTIONER
 

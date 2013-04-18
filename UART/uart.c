@@ -1,6 +1,3 @@
-#ifndef UART_H
-#define UART_H
-
 #include "uart.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -114,5 +111,3 @@ ISR(USART0_RX_vect){
 		// ändra pinne så att det inte går att skicka? /Johan
 	}
 }
-
-#endif

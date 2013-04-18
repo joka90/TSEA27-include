@@ -1,6 +1,5 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
-
 #include <stdint.h>
 
 //exchange databit 
@@ -52,6 +51,15 @@
 
 #define START 1 
 #define END 0 
+
+//macros to code/decode messages
+#define GET_LEN(x) (x)&0b00011111
+#define SET_LEN(x) (x)
+
+#define GET_TYPE(x) (((x)&0b11100000)>>5)
+#define SET_TYPE(x) ((x)<<5)
+
+#define CREATE_HEAD(x,y) ((x)<<5)|(y)
 
 /*
  Skapar ett meddelande (msg) från en given typ (type) och given parameterarray (param)
