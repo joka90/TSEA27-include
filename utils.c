@@ -49,7 +49,7 @@ uint16_t absThreshold(uint16_t a1, uint16_t a2)
     return a1-a2;
   }
 }
-void insertionSort(uint16_t *a, uint8_t array_size)
+void insertionSort(volatile uint16_t *a, uint8_t array_size)
 {
      uint8_t i, j;
 	 uint16_t index;
@@ -62,7 +62,7 @@ void insertionSort(uint16_t *a, uint8_t array_size)
           a[j] = index;
      }
 }
-uint16_t median(uint16_t *a, uint8_t size)
+uint16_t median(volatile uint16_t *a, uint8_t size)
 {
 	insertionSort(a,size);
 	return a[size>>1];
