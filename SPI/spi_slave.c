@@ -73,7 +73,7 @@ uint8_t SPI_SLAVE_read(uint8_t *msg, uint8_t* type, uint8_t *len)
 	*type = *type>>5;
 	*len = *len&0x1f;
 	
-	if(cbBytesUsed(&rxbuffer) < *len)
+	if(cbBytesUsed(&rxbuffer) < *len+1)
 	{
 		return 0;
 	}
