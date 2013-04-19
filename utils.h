@@ -4,6 +4,7 @@
 * Spara funtioner som är bra att ha på flera enheter här. T.ex räkna ut median, Medelvärde eller dyl.
 * Spara div. macron med mer.
 */
+#include <stdint.h>
 
 //macros
 #define BIT(x) (1 << (x))
