@@ -5,6 +5,9 @@
 #define DD_MISO PB6
 #define DD_SCK PB7
 
+#include <util/delay.h>
+#define F_CPU 8000000UL // 8mhz
+
 /*
 Ställer in alla register för att agera som master.
 */
@@ -29,7 +32,7 @@ Skriver direkt. Returnerar 0 för fel, 1 för lyckad sparning.
 */
 uint8_t SPI_MASTER_write(uint8_t *msg, uint8_t type, uint8_t len)
 {	
-	SPDR = (type<<5)||len;
+	SPDR = (type<<5)|len;
 	while(!(SPSR & (1<<SPIF)));
 	for(uint8_t i = 0; i < len; i++)
 	{
@@ -51,11 +54,13 @@ uint8_t SPI_MASTER_read(uint8_t *msg, uint8_t* type, uint8_t *len)
 	SPDR=CMD_EXCHANGE_DATA;
 	/* Wait for transmission complete */
 	while(!(SPSR & (1<<SPIF))); //???
-	*len=0b00011111&SPDR;//klipp bort typ
-	*type=0b11100000&SPDR;
+	uint8_t data = SPDR;
+	*len=0b00011111&data;//klipp bort typ
+	*type=0b11100000&data;
 	*type = *type>>5;
 	for(uint8_t i = 0; i <*len; i++)
 	{
+		_delay_us(100);
 		//send exchange byte
 		SPDR=CMD_EXCHANGE_DATA;
 		/* Wait for transmission complete */
