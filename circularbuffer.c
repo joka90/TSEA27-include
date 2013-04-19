@@ -49,18 +49,18 @@ void cbWrite(CircularBuffer *cb, uint8_t elem) {
 	}		
 	else
 	{
-		cb->size = cb->size+1;
+		cb->bytesUsed = cb->bytesUsed+1;
 	}		
 }
 
 /* Read oldest element. App must ensure !cbIsEmpty() first. */
 uint8_t cbRead(CircularBuffer *cb) {
-	if(cb->size == 0)
+	if(cb->bytesUsed == 0)
 	{
 		return 0xff;
 	}
 	uint8_t oldstart = cb->start;
-	cb->size = cb->size-1;
+	cb->bytesUsed = cb->bytesUsed-1;
 	cb->start = (cb->start + 1) % cb->size;
     return cb->bytes[oldstart];
 }

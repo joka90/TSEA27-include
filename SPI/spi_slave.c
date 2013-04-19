@@ -1,4 +1,5 @@
 ﻿#include "spi_slave.h"
+#include "../circularbuffer.h"
 
 #define DDR_SPI DDRB
 #define DD_MOSI PB5
@@ -8,63 +9,18 @@
 uint8_t recv_mode=0;
 uint8_t current_packet_len=0;
 uint8_t current_len;
-volatile uint8_t txbuffer[SPI_BUFFERSIZE];// volatile because read in interupt and in main program.,
-volatile uint8_t tx_start;
-volatile uint8_t tx_end;
-volatile uint8_t tx_size;
-volatile uint8_t rxbuffer[SPI_BUFFERSIZE];
-volatile uint8_t rx_start;
-volatile uint8_t rx_end;
-volatile uint8_t rx_size;
-
-void circularBufferAdd(volatile uint8_t* buffer, uint8_t element, volatile uint8_t* end, volatile uint8_t* size, uint8_t SIZE)
-{
-	buffer[*end] = element;
-	if(*end == SIZE)
-	{
-		*end = 0;
-	}
-	else
-	{
-		*end = *end+1;
-	}
-	*size = *size +1;
-}
-
-uint8_t circularBufferRead(volatile uint8_t* buffer, volatile uint8_t* start, volatile uint8_t* size, uint8_t SIZE)
-{
-	uint8_t ret = buffer[*start];
-	if(*start == SIZE)
-	{
-		*start = 0;
-	}
-	else
-	{
-		*start = *start+1;
-	}
-	*size = *size - 1;
-	return ret;
-}
-
-void circularBufferPutBack(volatile uint8_t* buffer, uint8_t element, volatile uint8_t* start, volatile uint8_t* size, uint8_t SIZE)
-{
-	if(*start == 0)
-	{
-		*start = SIZE;
-	}
-	else
-	{
-		*start = *start-1;
-	}
-	buffer[*start] = element;
-	*size = *size + 1;
-}
+volatile CircularBuffer txbuffer;
+volatile CircularBuffer rxbuffer;
+uint8_t SPDRFilled;
 
 /*
 Ställer in alla register för att agera som slave.
 */
 void SPI_SLAVE_init()
 {
+	SPDRFilled = 0;
+	cbInit (&txbuffer, SPI_BUFFERSIZE);
+	cbInit (&rxbuffer, SPI_BUFFERSIZE);
 	/* PRR0 = PSPI; // PSI måste vara noll för att enabla SPI modulen*/
 	/* Set MISO output, all others input */
 	DDR_SPI = 0;
@@ -81,17 +37,22 @@ Returnerar 0 för fel, 1 för lyckad sparning.
 uint8_t SPI_SLAVE_write(uint8_t *msg, uint8_t type, uint8_t len)
 {
 	//får paketet plats
-	if(len+2 > SPI_BUFFERSIZE-tx_size)
+	if(len+1 > cbBytesFree(&txbuffer))
 	{
 		return 0;
 	}
-	circularBufferAdd(txbuffer, (type<<5)||len, &tx_end, &tx_size, SPI_BUFFERSIZE);//add header
+	cbWrite(&txbuffer, (type<<5)|len);//add header
 	//stoppa in paket i tx buffern
 	uint8_t i = 0;
 	while(i < len)
 	{
-		circularBufferAdd(txbuffer, msg[i], &tx_end, &tx_size, SPI_BUFFERSIZE);
-		i = i + 1;
+		cbWrite(&txbuffer, msg[i]);
+		++i;
+	}
+	if(SPDRFilled == 0)
+	{
+		SPDR = cbRead(&txbuffer);
+		SPDRFilled = 1;
 	}
 	return 1;
 }
@@ -103,24 +64,24 @@ paketet. Returnerar 0 för fel (om buffern var tom), 1 för lyckad läsning
 */
 uint8_t SPI_SLAVE_read(uint8_t *msg, uint8_t* type, uint8_t *len)
 {
-	if(rx_size == 0)
+	if(cbBytesUsed(&rxbuffer) == 0)
 	{
 		return 0;
 	}
-	*len = circularBufferRead(rxbuffer, &rx_start, &rx_size, SPI_BUFFERSIZE);
+	*len = cbPeek(&rxbuffer);
 	*type=0b11100000&*len;
 	*type = *type>>5;
 	*len = *len&0x1f;
 	
-	if(rx_size < *len)
+	if(cbBytesUsed(&rxbuffer) < *len)
 	{
-		circularBufferPutBack(rxbuffer, msg[0], &rx_start, &rx_size, SPI_BUFFERSIZE);
 		return 0;
 	}
+	uint8_t dummy = cbRead(&rxbuffer);
 	uint8_t i = 0;
 	while(i < *len)
 	{
-		msg[i] = circularBufferRead(rxbuffer, &rx_start, &rx_size, SPI_BUFFERSIZE);
+		msg[i] = cbRead(&rxbuffer);
 		i++;
 	}
 	return 1;
@@ -136,7 +97,6 @@ uint8_t SPI_SLAVE_read(uint8_t *msg, uint8_t* type, uint8_t *len)
 ISR(SPI_STC_vect)
 {
 	uint8_t data = SPDR;
-	txbuffer[7] = data;
 	if(recv_mode)
 	{
 		current_len++;
@@ -144,15 +104,19 @@ ISR(SPI_STC_vect)
 		{
 			recv_mode=0;
 		}
-		circularBufferAdd(rxbuffer, data, &rx_end, &rx_size, SPI_BUFFERSIZE);
-		//STOPPA byten in i SPI-RX-buffer(på  rx_end), uppdatera rx_end+len
-		//TODO
-		SPDR=data;//trigger confirm?
-
+		cbWrite(&rxbuffer, data);
 	}
 	else if(data==CMD_EXCHANGE_DATA)
 	{
-		SPDR = circularBufferRead(txbuffer, &tx_start, &tx_size, SPI_BUFFERSIZE);
+		if(cbBytesUsed(&txbuffer) == 0)
+		{
+			SPDRFilled = 0;
+		}
+		else
+		{
+			uint8_t datatemp = cbRead(&txbuffer);
+			SPDR = datatemp;	
+		}
 	}
 	else
 	{
@@ -165,8 +129,6 @@ ISR(SPI_STC_vect)
 		{
 			recv_mode=0;
 		}
-		circularBufferAdd(rxbuffer, data, &rx_end, &rx_size, SPI_BUFFERSIZE);
-		SPDR=data;//trigger confirm?
-
+		cbWrite(&rxbuffer, data);
 	}
 }

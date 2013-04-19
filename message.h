@@ -1,6 +1,5 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
-
 #include <stdint.h>
 
 //exchange databit 
@@ -21,18 +20,20 @@
 
 //sensor taemot
 #define TYPE_REQUEST_SENSOR_DATA 0x00 // 000
+#define TYPE_CALIBRATE_GYRO		 0x01 // 001
 
 //sensor skicka
 #define TYPE_REPLY_SENSOR_DATA   0x00 // 000
+#define TYPE_REPLY_CALIBRATE_GYRO 0x01 // 001
 
-#define IDSENSOR1 0x00
-#define IDSENSOR2 0x01
-#define IDSENSOR3 0x02
-#define IDSENSOR4 0x03
-#define IDSENSOR5 0x04
-#define IDSENSOR6 0x05
-#define IDSENSOR7 0x06
-#define IDSENSOR8 0x07
+#define LONGFRONT 0x00
+#define LONGRIGHT 0x01
+#define LONGREAR 0x02
+#define LONGLEFT 0x03
+#define SHORTFRONTRIGHT 0x04
+#define SHORTFRONTLEFT 0x05
+#define SHORTREARRIGHT 0x06
+#define SHORTREARLEFT 0x07
 #define IDGYROSENSOR 0x08
 #define IDSPEEDRIGHT 0x09
 #define IDSPEEDLEFT 0x0a
@@ -52,6 +53,15 @@
 
 #define START 1 
 #define END 0 
+
+//macros to code/decode messages
+#define GET_LEN(x) (x)&0b00011111
+#define SET_LEN(x) (x)
+
+#define GET_TYPE(x) (((x)&0b11100000)>>5)
+#define SET_TYPE(x) ((x)<<5)
+
+#define CREATE_HEAD(x,y) ((x)<<5)|(y)
 
 /*
  Skapar ett meddelande (msg) från en given typ (type) och given parameterarray (param)
