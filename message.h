@@ -39,8 +39,8 @@
 #define IDSPEEDLEFT 0x0a
 
 //reglerparam
-#define PARAMLEFTCUSTOM 0x00
-#define PARAMRIGHTCUSTOM 0x01
+#define PARAMLEFTCUSTOM 0x06
+#define PARAMRIGHTCUSTOM 0x05
 
 //styrkommandon
 #define FORWARD_COMMAND 0
