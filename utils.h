@@ -20,5 +20,7 @@
 
 uint16_t filterSampleArrayMeanPlusPlus(volatile uint16_t  *samples, uint8_t numOfSamples, uint8_t threshold);
 uint16_t absThreshold(uint16_t a1, uint16_t a2);
+void insertionSort(uint16_t *a, uint8_t array_size);
+uint16_t median(uint16_t *a, uint8_t size);
 
 #endif

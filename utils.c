@@ -49,3 +49,21 @@ uint16_t absThreshold(uint16_t a1, uint16_t a2)
     return a1-a2;
   }
 }
+void insertionSort(uint16_t *a, uint8_t array_size)
+{
+     uint8_t i, j;
+	 uint16_t index;
+     for (i = 1; i < array_size; ++i)
+     {
+          index = a[i];
+          for (j = i; j > 0 && a[j-1] > index; j--)
+               a[j] = a[j-1];
+
+          a[j] = index;
+     }
+}
+uint16_t median(uint16_t *a, uint8_t size)
+{
+	insertionSort(a,size);
+	return a[size>>1];
+}
