@@ -39,7 +39,7 @@ void UART_writeMessage(uint8_t* msg, uint8_t type, uint8_t size)
 	while (!( UCSR0A & (1<<UDRE0)));
 			
 	/* Put data into buffer, sends the data */
-	UDR0 = (type<<5)||size;//header data
+	UDR0 = (type<<5)|size;//header data
 	
 	for(int i = 0; i < size; i++){
 		
