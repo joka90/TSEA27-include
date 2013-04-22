@@ -2,7 +2,7 @@
 #define RINGBUFFER_H
 
 #include <stdint.h>
-
+#include <stdlib.h>
  
 /* Circular buffer object */
 typedef struct {
@@ -14,25 +14,25 @@ typedef struct {
 } CircularBuffer;
 
 // För att initiera en cirkulär buffer
-void cbInit(CircularBuffer *cb, uint8_t size);
+void cbInit(volatile CircularBuffer *cb, uint8_t size);
 
-void cbFree(CircularBuffer *cb);
+void cbFree(volatile CircularBuffer *cb);
 
-uint8_t cbIsFull(CircularBuffer *cb);
+uint8_t cbIsFull(volatile CircularBuffer *cb);
 
-uint8_t cbIsEmpty(CircularBuffer *cb);
+uint8_t cbIsEmpty(volatile CircularBuffer *cb);
 
-uint8_t cbBytesUsed(CircularBuffer *cb);
+uint8_t cbBytesUsed(volatile CircularBuffer *cb);
 
-uint8_t cbBytesFree(CircularBuffer *cb);
+uint8_t cbBytesFree(volatile CircularBuffer *cb);
 
-uint8_t cbPeek(CircularBuffer *cb);
+uint8_t cbPeek(volatile CircularBuffer *cb);
 
 /* Write an element, overwriting oldest element if buffer is full. App can
    choose to avoid the overwrite by checking cbIsFull(). */
-void cbWrite(CircularBuffer *cb, uint8_t elem);
+void cbWrite(volatile CircularBuffer *cb, uint8_t elem);
 
 /* Read oldest element. App must ensure !cbIsEmpty() first. */
-uint8_t cbRead(CircularBuffer *cb);
+uint8_t cbRead(volatile CircularBuffer *cb);
 
 #endif

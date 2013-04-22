@@ -2,7 +2,7 @@
 
 // Initierar en cirkulär buffer
 //Struct partly copied from wikipedia
-void cbInit (CircularBuffer *cb, uint8_t size) 
+void cbInit (volatile CircularBuffer *cb, uint8_t size) 
 {
     cb->size  = size;
     cb->start = 0;
@@ -11,36 +11,36 @@ void cbInit (CircularBuffer *cb, uint8_t size)
     cb->bytes = (uint8_t*)malloc(cb->size);
 }
 
-void cbFree(CircularBuffer *cb) {
+void cbFree(volatile CircularBuffer *cb) {
     free(cb->bytes); /* OK if null */
 }
  
-uint8_t cbIsFull(CircularBuffer *cb) {
+uint8_t cbIsFull(volatile CircularBuffer *cb) {
     return (cb->bytesUsed == cb->size);
 }
  
-uint8_t cbIsEmpty(CircularBuffer *cb) {
+uint8_t cbIsEmpty(volatile CircularBuffer *cb) {
     return (cb->bytesUsed == 0); 
 }
 
-uint8_t cbBytesUsed(CircularBuffer *cb)
+uint8_t cbBytesUsed(volatile CircularBuffer *cb)
 {
 	return cb->bytesUsed;
 }	
 
-uint8_t cbBytesFree(CircularBuffer *cb)
+uint8_t cbBytesFree(volatile CircularBuffer *cb)
 {
 	return (cb->size-cb->bytesUsed);
 }
 
-uint8_t cbPeek(CircularBuffer *cb)
+uint8_t cbPeek(volatile CircularBuffer *cb)
 {
 	return cb->bytes[cb->start];
 }
  
 /* Write an element, overwriting oldest element if buffer is full. App can
    choose to avoid the overwrite by checking cbIsFull(). */
-void cbWrite(CircularBuffer *cb, uint8_t elem) {
+void cbWrite(volatile CircularBuffer *cb, uint8_t elem) {
     cb->bytes[cb->end] = elem;
     cb->end = (cb->end + 1) % cb->size;
     if (cb->end == cb->start)
@@ -54,7 +54,7 @@ void cbWrite(CircularBuffer *cb, uint8_t elem) {
 }
 
 /* Read oldest element. App must ensure !cbIsEmpty() first. */
-uint8_t cbRead(CircularBuffer *cb) {
+uint8_t cbRead(volatile CircularBuffer *cb) {
 	if(cb->bytesUsed == 0)
 	{
 		return 0xff;

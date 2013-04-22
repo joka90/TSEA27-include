@@ -6,7 +6,6 @@
 #define DD_SCK PB7
 
 #include <util/delay.h>
-#define F_CPU 8000000UL // 8mhz
 
 /*
 Ställer in alla register för att agera som master.
@@ -36,6 +35,7 @@ uint8_t SPI_MASTER_write(uint8_t *msg, uint8_t type, uint8_t len)
 	while(!(SPSR & (1<<SPIF)));
 	for(uint8_t i = 0; i < len; i++)
 	{
+		_delay_us(100);
 		/* Start transmission */
 		SPDR = msg[i];
 		/* Wait for transmission complete */
