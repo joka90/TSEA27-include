@@ -12,14 +12,14 @@ volatile uint8_t current_packet_len=0;
 volatile uint8_t current_len;
 volatile CircularBuffer txbuffer;
 volatile CircularBuffer rxbuffer;
-volatile uint8_t SPDRFilled;
+volatile uint8_t minOneMsgInBuffer;
 
 /*
 Ställer in alla register för att agera som slave.
 */
 void SPI_SLAVE_init()
 {
-	SPDRFilled = 0;
+	minOneMsgInBuffer = 0;
 	cbInit (&txbuffer, SPI_BUFFERSIZE);
 	cbInit (&rxbuffer, SPI_BUFFERSIZE);
 	/* PRR0 = PSPI; // PSI måste vara noll för att enabla SPI modulen*/
@@ -28,34 +28,6 @@ void SPI_SLAVE_init()
 	DDR_SPI = (1<<DD_MISO);
 	/* Enable SPI */
 	SPCR = (1<<SPE)|(1<<SPIE);
-}
-
-
-/*
-Sparar ovanstående på skrivbuffern samt startar skrivningen vilken upphör när hela buffern skrivit klart.
-Returnerar 0 för fel, 1 för lyckad sparning.
-*/
-uint8_t SPI_SLAVE_write(uint8_t *msg, uint8_t type, uint8_t len)
-{
-	//får paketet plats
-	if(len+1 > cbBytesFree(&txbuffer))
-	{
-		return 0;
-	}
-	cbWrite(&txbuffer, (type<<5)|len);//add header
-	//stoppa in paket i tx buffern
-	uint8_t i = 0;
-	while(i < len)
-	{
-		cbWrite(&txbuffer, msg[i]);
-		++i;
-	}
-	if(SPDRFilled == 0)
-	{
-		SPDR = cbRead(&txbuffer);
-		SPDRFilled = 1;
-	}
-	return 1;
 }
 
 
@@ -95,6 +67,32 @@ uint8_t SPI_SLAVE_read(uint8_t *msg, uint8_t* type, uint8_t *len)
 	*/
 }
 
+/*
+Sparar ovanstående på skrivbuffern samt startar skrivningen vilken upphör när hela buffern skrivit klart.
+Returnerar 0 för fel, 1 för lyckad sparning.
+*/
+uint8_t SPI_SLAVE_write(uint8_t *msg, uint8_t type, uint8_t len)
+{
+	//får paketet plats
+	if(len+1 > cbBytesFree(&txbuffer))
+	{
+		return 0;
+	}
+	cbWrite(&txbuffer, (type<<5)|len);//add header
+	//stoppa in paket i tx buffern
+	uint8_t i = 0;
+	while(i < len)
+	{
+		cbWrite(&txbuffer, msg[i]);
+		++i;
+	}
+	if(minOneMsgInBuffer == 0)
+	{
+		minOneMsgInBuffer = 1;
+	}
+	return 1;
+}
+
 ISR(SPI_STC_vect)
 {
 	uint8_t data = SPDR;
@@ -111,13 +109,16 @@ ISR(SPI_STC_vect)
 	{
 		if(cbBytesUsed(&txbuffer) == 0)
 		{
-			SPDRFilled = 0;
-			SPDR=CMD_EXCHANGE_DATA;//svara att den är tom, detta kommer skrivas över vid SPI_write då en ny överföring görs pga SPDRFilled ==0
+			minOneMsgInBuffer = 0;
+			SPDR=CMD_EXCHANGE_DATA;//svara att den är tom, detta kommer skrivas över vid SPI_write då en ny överföring görs pga minOneMsgInBuffer ==0
+		}
+		else if(minOneMsgInBuffer == 1)// Används för att inte läsa ut head medans resterande medelande skrivs in i txbuffern
+		{
+			SPDR = cbRead(&txbuffer);	
 		}
 		else
 		{
-			uint8_t datatemp = cbRead(&txbuffer);
-			SPDR = datatemp;	
+			SPDR=CMD_EXCHANGE_DATA;// Skicka ej redo om medans vi skriver in i txbuffern.
 		}
 	}
 	else
@@ -132,5 +133,6 @@ ISR(SPI_STC_vect)
 			recv_mode=0;
 		}
 		cbWrite(&rxbuffer, data);
+		SPDR=CMD_EXCHANGE_DATA;// För att ifall vi inte hinner till SPI_SLAVE_write, så skicka att vi inte hunnit
 	}
 }
