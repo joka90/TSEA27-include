@@ -6,12 +6,13 @@
 #define DD_MISO PB6
 #define DD_SCK PB7
 
-uint8_t recv_mode=0;
-uint8_t current_packet_len=0;
-uint8_t current_len;
+volatile uint8_t recv_mode=0;
+volatile uint8_t transmit_mode=0;
+volatile uint8_t current_packet_len=0;
+volatile uint8_t current_len;
 volatile CircularBuffer txbuffer;
 volatile CircularBuffer rxbuffer;
-uint8_t SPDRFilled;
+volatile uint8_t SPDRFilled;
 
 /*
 Ställer in alla register för att agera som slave.
@@ -111,6 +112,7 @@ ISR(SPI_STC_vect)
 		if(cbBytesUsed(&txbuffer) == 0)
 		{
 			SPDRFilled = 0;
+			SPDR=CMD_EXCHANGE_DATA;//svara att den är tom, detta kommer skrivas över vid SPI_write då en ny överföring görs pga SPDRFilled ==0
 		}
 		else
 		{
