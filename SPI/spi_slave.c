@@ -32,34 +32,6 @@ void SPI_SLAVE_init()
 
 
 /*
-Sparar ovanstående på skrivbuffern samt startar skrivningen vilken upphör när hela buffern skrivit klart.
-Returnerar 0 för fel, 1 för lyckad sparning.
-*/
-uint8_t SPI_SLAVE_write(uint8_t *msg, uint8_t type, uint8_t len)
-{
-	//får paketet plats
-	if(len+1 > cbBytesFree(&txbuffer))
-	{
-		return 0;
-	}
-	cbWrite(&txbuffer, (type<<5)|len);//add header
-	//stoppa in paket i tx buffern
-	uint8_t i = 0;
-	while(i < len)
-	{
-		cbWrite(&txbuffer, msg[i]);
-		++i;
-	}
-	if(SPDRFilled == 0)
-	{
-		SPDR = cbRead(&txbuffer);
-		SPDRFilled = 1;
-	}
-	return 1;
-}
-
-
-/*
 Läser in nästa meddelande från buffern och sparar det i msg, samt dess längd i len. len sparas i bit 5 till 7 i
 paketet. Returnerar 0 för fel (om buffern var tom), 1 för lyckad läsning
 */
@@ -95,6 +67,33 @@ uint8_t SPI_SLAVE_read(uint8_t *msg, uint8_t* type, uint8_t *len)
 	*/
 }
 
+/*
+Sparar ovanstående på skrivbuffern samt startar skrivningen vilken upphör när hela buffern skrivit klart.
+Returnerar 0 för fel, 1 för lyckad sparning.
+*/
+uint8_t SPI_SLAVE_write(uint8_t *msg, uint8_t type, uint8_t len)
+{
+	//får paketet plats
+	if(len+1 > cbBytesFree(&txbuffer))
+	{
+		return 0;
+	}
+	cbWrite(&txbuffer, (type<<5)|len);//add header
+	//stoppa in paket i tx buffern
+	uint8_t i = 0;
+	while(i < len)
+	{
+		cbWrite(&txbuffer, msg[i]);
+		++i;
+	}
+	if(SPDRFilled == 0)
+	{
+		SPDR = cbRead(&txbuffer);
+		SPDRFilled = 1;
+	}
+	return 1;
+}
+
 ISR(SPI_STC_vect)
 {
 	uint8_t data = SPDR;
@@ -114,10 +113,14 @@ ISR(SPI_STC_vect)
 			SPDRFilled = 0;
 			SPDR=CMD_EXCHANGE_DATA;//svara att den är tom, detta kommer skrivas över vid SPI_write då en ny överföring görs pga SPDRFilled ==0
 		}
-		else
+		else if(SPDRFilled == 1)// Används för att inte läsa ut head medans resterande medelande skrivs in i txbuffern
 		{
 			uint8_t datatemp = cbRead(&txbuffer);
 			SPDR = datatemp;	
+		}
+		else
+		{
+			SPDR=CMD_EXCHANGE_DATA;// Skicka ej redo om medans vi skriver in i txbuffern.
 		}
 	}
 	else
@@ -132,5 +135,6 @@ ISR(SPI_STC_vect)
 			recv_mode=0;
 		}
 		cbWrite(&rxbuffer, data);
+		SPDR=CMD_EXCHANGE_DATA;// För att ifall vi inte hinner till SPI_SLAVE_write, så skicka att vi inte hunnit
 	}
 }
