@@ -21,8 +21,8 @@ void SPI_MASTER_init(void)
 	DDR_SPI |= (1<<DDB4)|(1<<DDB3);
 	PORTB |= (1<<PB4)|(1<<PB3);// sätt båda slavarna höga
 	
-	/* Enable SPI, Master, set clock rate fck/16 */
-	SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0);
+	/* Enable SPI, Master, set clock rate fck/128 */
+	SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR1)|(1<<SPR0);
 }
 
 
@@ -35,7 +35,7 @@ uint8_t SPI_MASTER_write(uint8_t *msg, uint8_t type, uint8_t len)
 	while(!(SPSR & (1<<SPIF)));
 	for(uint8_t i = 0; i < len; i++)
 	{
-		_delay_us(900);
+		//_delay_us(900);
 		/* Start transmission */
 		SPDR = msg[i];
 		/* Wait for transmission complete */
@@ -53,21 +53,28 @@ uint8_t SPI_MASTER_read(uint8_t *msg, uint8_t* type, uint8_t *len)
 	//send exchange byte
 	SPDR=CMD_EXCHANGE_DATA;
 	/* Wait for transmission complete */
-	while(!(SPSR & (1<<SPIF))); //???
+	while(!(SPSR & (1<<SPIF)));
 	uint8_t data = SPDR;
-	*len=0b00011111&data;//klipp bort typ
-	*type=0b11100000&data;
-	*type = *type>>5;
-	for(uint8_t i = 0; i <*len; i++)
+	if(data != CMD_EXCHANGE_DATA)//kolla så inte Txbuffer är tom på slaven.
 	{
-		_delay_us(900);
-		//send exchange byte
-		SPDR=CMD_EXCHANGE_DATA;
-		/* Wait for transmission complete */
-		while(!(SPSR & (1<<SPIF)));
-		msg[i]=SPDR;//spara i:te byten
+		*len=0b00011111&data;//klipp bort typ
+		*type=0b11100000&data;
+		*type = *type>>5;
+		for(uint8_t i = 0; i < *len; i++)
+		{
+			_delay_us(900);//hur lång tid det tar för att komma till ett interupt?
+			//send exchange byte
+			SPDR=CMD_EXCHANGE_DATA;
+			/* Wait for transmission complete */
+			while(!(SPSR & (1<<SPIF)));
+			msg[i]=SPDR;//spara i:te byten
+		}
+		return 1;
 	}
-	return 1;
+	else
+	{
+		return 0;
+	}
 }
 
 
