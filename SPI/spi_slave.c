@@ -12,14 +12,14 @@ volatile uint8_t current_packet_len=0;
 volatile uint8_t current_len;
 volatile CircularBuffer txbuffer;
 volatile CircularBuffer rxbuffer;
-volatile uint8_t SPDRFilled;
+volatile uint8_t minOneMsgInBuffer;
 
 /*
 Ställer in alla register för att agera som slave.
 */
 void SPI_SLAVE_init()
 {
-	SPDRFilled = 0;
+	minOneMsgInBuffer = 0;
 	cbInit (&txbuffer, SPI_BUFFERSIZE);
 	cbInit (&rxbuffer, SPI_BUFFERSIZE);
 	/* PRR0 = PSPI; // PSI måste vara noll för att enabla SPI modulen*/
@@ -86,10 +86,9 @@ uint8_t SPI_SLAVE_write(uint8_t *msg, uint8_t type, uint8_t len)
 		cbWrite(&txbuffer, msg[i]);
 		++i;
 	}
-	if(SPDRFilled == 0)
+	if(minOneMsgInBuffer == 0)
 	{
-		SPDR = cbRead(&txbuffer);
-		SPDRFilled = 1;
+		minOneMsgInBuffer = 1;
 	}
 	return 1;
 }
@@ -110,13 +109,12 @@ ISR(SPI_STC_vect)
 	{
 		if(cbBytesUsed(&txbuffer) == 0)
 		{
-			SPDRFilled = 0;
-			SPDR=CMD_EXCHANGE_DATA;//svara att den är tom, detta kommer skrivas över vid SPI_write då en ny överföring görs pga SPDRFilled ==0
+			minOneMsgInBuffer = 0;
+			SPDR=CMD_EXCHANGE_DATA;//svara att den är tom, detta kommer skrivas över vid SPI_write då en ny överföring görs pga minOneMsgInBuffer ==0
 		}
-		else if(SPDRFilled == 1)// Används för att inte läsa ut head medans resterande medelande skrivs in i txbuffern
+		else if(minOneMsgInBuffer == 1)// Används för att inte läsa ut head medans resterande medelande skrivs in i txbuffern
 		{
-			uint8_t datatemp = cbRead(&txbuffer);
-			SPDR = datatemp;	
+			SPDR = cbRead(&txbuffer);	
 		}
 		else
 		{
