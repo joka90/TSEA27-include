@@ -42,10 +42,20 @@ uint8_t cbPeek(volatile CircularBuffer *cb)
    choose to avoid the overwrite by checking cbIsFull(). */
 void cbWrite(volatile CircularBuffer *cb, uint8_t elem) {
     cb->bytes[cb->end] = elem;
-    cb->end = (cb->end + 1) % cb->size;
+	uint8_t newEnd = cb->end+1;
+	if(cb->size<=newEnd)
+	{
+		newEnd=0;
+	}
+    cb->end = newEnd;//(cb->end + 1) % cb->size;
     if (cb->end == cb->start)
 	{
-        cb->start = (cb->start + 1) % cb->size; /* full, overwrite */
+        	uint8_t newStart = cb->start+1;
+        	if(cb->size<=newStart)
+        	{
+	        	newStart=0;
+        	}
+        	cb->start = newStart; /* full, overwrite */
 	}		
 	else
 	{
@@ -61,6 +71,11 @@ uint8_t cbRead(volatile CircularBuffer *cb) {
 	}
 	uint8_t oldstart = cb->start;
 	cb->bytesUsed = cb->bytesUsed-1;
-	cb->start = (cb->start + 1) % cb->size;
+	uint8_t newStart = cb->start+1;
+	if(cb->size<=newStart)
+	{
+		newStart=0;
+	}
+	cb->start = newStart;
     return cb->bytes[oldstart];
 }
