@@ -1,7 +1,7 @@
 #include "uart.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
-
+#include <util/delay.h>
 /*
 Ställer in alla register samt hastighet för porten.
 */
@@ -10,9 +10,10 @@ void UART_init()
 	/// SÄTT UPP USART
 	
 	/* Set baud rate */
-	unsigned char baud = 99;//63;
-	UBRR0H = (unsigned char)(baud>>8);
-	UBRR0L = (unsigned char)baud;
+	uint16_t baud = 99;//63;
+	UBRR0 = baud;
+	//UBRR0H = (unsigned char)(baud>>8);
+	//UBRR0L = (unsigned char)baud;
 	/* Enable receiver and transmitter, and enable interrupts on receiving */
 	UCSR0B = (1<<RXEN0)|(1<<TXEN0)|(1<<RXCIE0);
 	/* Set frame format: 8data, 1stop bit */
@@ -21,15 +22,32 @@ void UART_init()
 	/// SÄTT UPP RX-BUFFER
 
 	cbInit(&_rxMessageBuffer, 100);
-	
-	/// Skicka Handshake ( FF FF )
-	for(int i = 0; i < 2; i++){	
+}
+
+void UART_handshake(void)
+{
+	uint8_t svar=0;
+	while(svar!=2)
+	{
 		/* Wait for empty transmit buffer */
 		while (!( UCSR0A & (1<<UDRE0)));
 		/* Put data into buffer, sends the data */
-		UDR0 = 0xFF;
+		UDR0 = 1;
+		
+		/* Wait for data to be received */
+		_delay_ms(10);
+		if((UCSR0A & (1<<RXC0)))
+		{
+			/* Get and return received data from buffer */
+			svar=UDR0;
+		}
 	}
+	/* Wait for empty transmit buffer */
+	while (!( UCSR0A & (1<<UDRE0)));
+	/* Put data into buffer, sends the data */
+	UDR0 = 3;
 }
+
 /*
 Skickar meddelandet som ges av msg, byte för byte.
 */
@@ -108,6 +126,6 @@ ISR(USART0_RX_vect){
 		
 	}else{
 		// rx-bufferten är full, vad göra?
-		// ändra pinne så att det inte går att skicka? /Johan
+		// ändra pinne så att det inte går att skicka? PD5 skall göras hög. /Johan
 	}
 }

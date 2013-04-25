@@ -26,4 +26,9 @@ Ställer in alla register samt hastighet för porten.
 */
 void UART_init();
 
+/*
+Handskakar med PCn
+*/
+void UART_handshake();
+
 #endif
