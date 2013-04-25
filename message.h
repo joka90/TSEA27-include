@@ -13,10 +13,11 @@
 
 //styr taemot
 #define TYPE_SENSOR_DATA		 0x00 // 000
-#define TYPE_MANUAL_COMMAND		 0x01 // 001
+#define TYPE_MANUAL_COMMAND		 0x05 // 101 , kan ej använda 0x01 001 pga krock
 #define TYPE_CHANGE_PARM		 0x02 // 010
 #define TYPE_NO_PC_MESSAGES		 0x03 // 011
 #define TYPE_EMERGENCY_STOP		 0x04 // 100
+
 
 //sensor taemot
 #define TYPE_REQUEST_SENSOR_DATA 0x00 // 000
