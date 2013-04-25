@@ -35,7 +35,7 @@ uint8_t SPI_MASTER_write(uint8_t *msg, uint8_t type, uint8_t len)
 	while(!(SPSR & (1<<SPIF)));
 	for(uint8_t i = 0; i < len; i++)
 	{
-		//_delay_us(900);
+		_delay_us(100);
 		/* Start transmission */
 		SPDR = msg[i];
 		/* Wait for transmission complete */
@@ -50,7 +50,7 @@ Läser direkt. Returnerar 0 för fel, 1 för lyckad läsning.
 */
 uint8_t SPI_MASTER_read(uint8_t *msg, uint8_t* type, uint8_t *len)
 {
-	#define SPI_TIME_WAIT 900
+	#define SPI_TIME_WAIT 10
 	_delay_us(SPI_TIME_WAIT);//hur lång tid det tar för att komma till ett interupt?
 	//send exchange byte
 	SPDR=CMD_EXCHANGE_DATA;
