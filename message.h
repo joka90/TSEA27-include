@@ -39,9 +39,13 @@
 #define IDSPEEDLEFT 0x0a
 
 //reglerparam
-#define PARAMLEFTCUSTOM 0x06
+#define	L1_STRAIGHTX 0x00
+#define L2_STRAIGHTTHETA 0x01
+#define L3_STRAIGHTOMEGA 0x02
+#define L1_TURNTHETA 0x03
+#define L2_TURNOMEGA 0x04
 #define PARAMRIGHTCUSTOM 0x05
-
+#define PARAMLEFTCUSTOM 0x06
 //styrkommandon
 #define FORWARD_COMMAND 0
 #define RIGHT_90_COMMAND 1
