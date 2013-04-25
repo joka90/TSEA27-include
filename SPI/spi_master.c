@@ -35,7 +35,7 @@ uint8_t SPI_MASTER_write(uint8_t *msg, uint8_t type, uint8_t len)
 	while(!(SPSR & (1<<SPIF)));
 	for(uint8_t i = 0; i < len; i++)
 	{
-		_delay_us(10);
+		_delay_us(100);
 		/* Start transmission */
 		SPDR = msg[i];
 		/* Wait for transmission complete */
