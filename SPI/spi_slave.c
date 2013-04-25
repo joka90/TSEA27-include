@@ -106,8 +106,8 @@ SPI Status Register with SPIF set, then accessing the SPI Data Register (SPDR).
 */
 ISR(SPI_STC_vect)
 {
+	volatile uint8_t status = SPIF;//clear interupt bit
 	uint8_t data = SPDR;
-	uint8_t status = SPIF;
 	if(data==CMD_EXCHANGE_DATA)
 	{
 		if(cbBytesUsed(&txbuffer) == 0)
