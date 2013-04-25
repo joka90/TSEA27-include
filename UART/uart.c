@@ -10,9 +10,10 @@ void UART_init()
 	/// SÄTT UPP USART
 	
 	/* Set baud rate */
-	unsigned char baud = 99;//63;
-	UBRR0H = (unsigned char)(baud>>8);
-	UBRR0L = (unsigned char)baud;
+	uint16_t baud = 99;//63;
+	UBRR0 = baud;
+	//UBRR0H = (unsigned char)(baud>>8);
+	//UBRR0L = (unsigned char)baud;
 	/* Enable receiver and transmitter, and enable interrupts on receiving */
 	UCSR0B = (1<<RXEN0)|(1<<TXEN0)|(1<<RXCIE0);
 	/* Set frame format: 8data, 1stop bit */

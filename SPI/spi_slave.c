@@ -28,6 +28,8 @@ void SPI_SLAVE_init()
 	DDR_SPI = (1<<DD_MISO);
 	/* Enable SPI */
 	SPCR = (1<<SPE)|(1<<SPIE);
+	
+	SPDR = CMD_EXCHANGE_DATA; // Skicka ej redo, om vi inte hunnit handskaka
 }
 
 
