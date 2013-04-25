@@ -35,7 +35,7 @@ void UART_handshake(void)
 		UDR0 = 1;
 		
 		/* Wait for data to be received */
-		_delay_ms(10);
+		_delay_ms(200);
 		if((UCSR0A & (1<<RXC0)))
 		{
 			/* Get and return received data from buffer */
