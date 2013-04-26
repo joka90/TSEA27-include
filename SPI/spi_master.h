@@ -19,12 +19,12 @@ void SPI_MASTER_init();
 /*
 Skriver direkt. Returnerar 0 för fel, 1 för lyckad sparning.
 */
-uint8_t SPI_MASTER_write(uint8_t *msg, uint8_t type, uint8_t len);
+uint8_t SPI_MASTER_write(volatile uint8_t *msg, volatile uint8_t type, volatile uint8_t len);
 
 /*
 Läser direkt. Returnerar 0 för fel, 1 för lyckad läsning.
 */
-uint8_t SPI_MASTER_read(uint8_t *msg, uint8_t* type, uint8_t *len);
+uint8_t SPI_MASTER_read(volatile uint8_t *msg, volatile uint8_t* type, volatile uint8_t *len);
 
 /*
 Väljer enhet som skall vara aktiv på bussen. Denna funktion kommer endast att finnas på styrenheten som är
