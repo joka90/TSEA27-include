@@ -50,8 +50,7 @@ Läser direkt. Returnerar 0 för fel, 1 för lyckad läsning.
 */
 uint8_t SPI_MASTER_read(uint8_t *msg, uint8_t* type, uint8_t *len)
 {
-	#define SPI_TIME_WAIT 40
-	_delay_us(SPI_TIME_WAIT);//hur lång tid det tar för att komma till ett interupt?
+	_delay_us(40);//hur lång tid det tar för att komma till ett interupt?
 	//send exchange byte
 	SPDR=CMD_EXCHANGE_DATA;
 	/* Wait for transmission complete */
@@ -64,7 +63,7 @@ uint8_t SPI_MASTER_read(uint8_t *msg, uint8_t* type, uint8_t *len)
 		*type = *type>>5;
 		for(uint8_t i = 0; i < *len; i++)
 		{
-			_delay_us(SPI_TIME_WAIT);//hur lång tid det tar för att komma till ett interupt?
+			_delay_us(10);//hur lång tid det tar för att komma till ett interupt?
 			//send exchange byte
 			SPDR=CMD_EXCHANGE_DATA;
 			/* Wait for transmission complete */
