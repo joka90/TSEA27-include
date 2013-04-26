@@ -26,32 +26,54 @@ void UART_init()
 	cbInit(&_rxMessageBuffer, 100);
 }
 
-
+uint8_t  UART_handshakeState=0;
+uint16_t  UART_handshakeStateTwoCounter=0;
 void UART_handshake(void)
 {
 	uint8_t svar=0;
-	/* Wait for empty transmit buffer */
-	while (!( UCSR0A & (1<<UDRE0)));
-	/* Put data into buffer, sends the data */
-	UDR0 = 1;
-	
-	/* Wait for data to be received */
-	_delay_ms(10);//TODO trimma
-	if((UCSR0A & (1<<RXC0)))
+	if(UART_handshakeState==0)
 	{
-		/* Get and return received data from buffer */
-		svar=UDR0;
+		/* Wait for empty transmit buffer */
+		while (!( UCSR0A & (1<<UDRE0)));
+		/* Put data into buffer, sends the data */
+		UDR0 = 1;
+		UART_handshakeState++;
 	}
-	if(svar==2)
+
+	if(UART_handshakeState==1)
+	{
+		/* Wait for data to be received */
+		if((UCSR0A & (1<<RXC0)))
+		{
+			/* Get and return received data from buffer */
+			svar=UDR0;
+			UART_handshakeState++;
+		}
+		else
+		{
+			UART_handshakeStateTwoCounter++;
+		}
+		
+		if(UART_handshakeStateTwoCounter>65000)
+		{
+			UART_handshakeStateTwoCounter=0;
+			UART_handshakeState=0;
+		}
+	}
+
+	if((svar==2)&&(UART_handshakeState==2))
 	{
 		handshaken=1;
 		UCSR0B |= (1 << RXCIE0);  //sets RXCIE0 in register UCSR0B to 1, to enable USART reception interrupt.
+		UART_handshakeState++;
 	}
-
-	/* Wait for empty transmit buffer */
-	while (!( UCSR0A & (1<<UDRE0)));
-	/* Put data into buffer, sends the data */
-	UDR0 = 3;
+	if(UART_handshakeState==3)
+	{
+		/* Wait for empty transmit buffer */
+		while (!( UCSR0A & (1<<UDRE0)));
+		/* Put data into buffer, sends the data */
+		UDR0 = 3;
+	}	
 }
 
 /*
@@ -79,7 +101,6 @@ uint8_t UART_writeMessage(uint8_t* msg, uint8_t type, uint8_t size)
 	}
 	else
 	{
-		UART_handshake();
 		return 0;
 	}
 }

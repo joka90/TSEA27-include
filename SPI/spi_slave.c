@@ -150,6 +150,7 @@ ISR(SPI_STC_vect)
 			data = SPDR;
 			cbWrite(&rxbuffer, data);
 			current_len++;
+			SPDR=CMD_EXCHANGE_DATA;
 		}
 	}
 	SPDR=CMD_EXCHANGE_DATA;// För att ifall vi inte hinner till SPI_SLAVE_write, så skicka att vi inte hunnit
