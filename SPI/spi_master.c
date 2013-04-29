@@ -6,7 +6,6 @@
 #define DD_SCK PB7
 
 #include <util/delay.h>
-#define F_CPU 8000000UL // 8mhz
 
 /*
 Ställer in alla register för att agera som master.
@@ -22,8 +21,8 @@ void SPI_MASTER_init(void)
 	DDR_SPI |= (1<<DDB4)|(1<<DDB3);
 	PORTB |= (1<<PB4)|(1<<PB3);// sätt båda slavarna höga
 	
-	/* Enable SPI, Master, set clock rate fck/16 */
-	SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0);
+	/* Enable SPI, Master, set clock rate fck/128 */
+	SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR1)|(1<<SPR0);
 }
 
 
@@ -36,10 +35,11 @@ uint8_t SPI_MASTER_write(uint8_t *msg, uint8_t type, uint8_t len)
 	while(!(SPSR & (1<<SPIF)));
 	for(uint8_t i = 0; i < len; i++)
 	{
+		_delay_us(100);
 		/* Start transmission */
 		SPDR = msg[i];
 		/* Wait for transmission complete */
-		while(!(SPSR & (1<<SPIF)));
+ 		while(!(SPSR & (1<<SPIF)));
 	}
 	return 1;
 }
@@ -50,24 +50,33 @@ Läser direkt. Returnerar 0 för fel, 1 för lyckad läsning.
 */
 uint8_t SPI_MASTER_read(uint8_t *msg, uint8_t* type, uint8_t *len)
 {
+	_delay_us(40);//hur lång tid det tar för att komma till ett interupt?
 	//send exchange byte
 	SPDR=CMD_EXCHANGE_DATA;
 	/* Wait for transmission complete */
-	while(!(SPSR & (1<<SPIF))); //???
+	while(!(SPSR & (1<<SPIF)));
 	uint8_t data = SPDR;
-	*len=0b00011111&data;//klipp bort typ
-	*type=0b11100000&data;
-	*type = *type>>5;
-	for(uint8_t i = 0; i <*len; i++)
+	if(data != CMD_EXCHANGE_DATA)//kolla så inte Txbuffer är tom på slaven.
 	{
-		_delay_us(100);
-		//send exchange byte
-		SPDR=CMD_EXCHANGE_DATA;
-		/* Wait for transmission complete */
-		while(!(SPSR & (1<<SPIF)));
-		msg[i]=SPDR;//spara i:te byten
+		*len=0b00011111&data;//klipp bort typ
+		*type=0b11100000&data;
+		*type = *type>>5;
+		for(uint8_t i = 0; i < *len; i++)
+		{
+			_delay_us(10);//hur lång tid det tar för att komma till ett interupt?
+			//send exchange byte
+			SPDR=CMD_EXCHANGE_DATA;
+			/* Wait for transmission complete */
+			while(!(SPSR & (1<<SPIF)));
+			volatile uint8_t tSPDR = SPDR;
+			msg[i]=tSPDR;//spara i:te byten
+		}
+		return 1;
 	}
-	return 1;
+	else
+	{
+		return 0;
+	}
 }
 
 

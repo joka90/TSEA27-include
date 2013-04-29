@@ -13,10 +13,11 @@
 
 //styr taemot
 #define TYPE_SENSOR_DATA		 0x00 // 000
-#define TYPE_MANUAL_COMMAND		 0x01 // 001
+#define TYPE_MANUAL_COMMAND		 0x05 // 101 , kan ej använda 0x01 001 pga krock
 #define TYPE_CHANGE_PARM		 0x02 // 010
 #define TYPE_NO_PC_MESSAGES		 0x03 // 011
 #define TYPE_EMERGENCY_STOP		 0x04 // 100
+
 
 //sensor taemot
 #define TYPE_REQUEST_SENSOR_DATA 0x00 // 000
@@ -39,9 +40,13 @@
 #define IDSPEEDLEFT 0x0a
 
 //reglerparam
-#define PARAMLEFTCUSTOM 0x06
+#define	L1_STRAIGHTX 0x00
+#define L2_STRAIGHTTHETA 0x01
+#define L3_STRAIGHTOMEGA 0x02
+#define L1_TURNTHETA 0x03
+#define L2_TURNOMEGA 0x04
 #define PARAMRIGHTCUSTOM 0x05
-
+#define PARAMLEFTCUSTOM 0x06
 //styrkommandon
 #define FORWARD_COMMAND 0
 #define RIGHT_90_COMMAND 1

@@ -8,12 +8,12 @@
 CircularBuffer _rxMessageBuffer; // Buffer för mottagna meddelanden
 
 //// PUBLIKA FUNKTIONER
-
+uint8_t handshaken;
 /*
 Sparar ovanstående på skrivbuffern samt startar skrivningen vilken upphör när hela buffern skrivit klart.
 Returnerar 0 för fel, 1 för lyckad sparning.
 */
-void UART_writeMessage(uint8_t* msg, uint8_t type, uint8_t size);
+uint8_t UART_writeMessage(uint8_t* msg, uint8_t type, uint8_t size);
 
 /*
 Läser in nästa datapaket från buffern och sparar det i msg, samt dess längd i len. len sparas i bit 5 till 7 i paketet.
@@ -25,5 +25,10 @@ uint8_t UART_readMessage(uint8_t *msg, uint8_t *type, uint8_t *length);
 Ställer in alla register samt hastighet för porten.
 */
 void UART_init();
+
+/*
+Handskakar med PCn
+*/
+void UART_handshake();
 
 #endif
