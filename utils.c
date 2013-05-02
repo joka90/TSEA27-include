@@ -63,3 +63,12 @@ uint16_t median(volatile uint16_t *a, uint8_t size)
 	insertionSort(a,size);
 	return a[size>>1];
 }
+int16_t int8to16(int8_t in)
+{
+	int16_t temp = getRelativeX();
+	if(temp > 128)
+	{
+		temp |= 0xFF00;
+	}
+	return temp;
+}
