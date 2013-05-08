@@ -6,7 +6,7 @@
 //exchange databit 
 #define CMD_EXCHANGE_DATA        0xE0 // 111 0 0000
 
-#define SPI_BUFFERSIZE        	 32
+#define SPI_BUFFERSIZE        	 200
 
 #define START 1 
 #define END 0 

@@ -55,7 +55,7 @@
 #define LEFT_45_COMMAND 4
 #define VIRTUAL_REVERSE_COMMAND 5
 #define CUSTOM_STEERING_COMMAND 6
-
+#define NULL_COMMAND 7
 #define START 1 
 #define END 0 
 
