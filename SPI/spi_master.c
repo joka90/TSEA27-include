@@ -33,9 +33,10 @@ uint8_t SPI_MASTER_write(uint8_t *msg, uint8_t type, uint8_t len)
 {	
 	SPDR = (type<<5)|len;
 	while(!(SPSR & (1<<SPIF)));
+	_delay_us(100);//time to enter interupt TODO TUNE
 	for(uint8_t i = 0; i < len; i++)
 	{
-		_delay_us(100);
+		_delay_us(10);//time to do some if else in the interutp TODO TUNE
 		/* Start transmission */
 		SPDR = msg[i];
 		/* Wait for transmission complete */
