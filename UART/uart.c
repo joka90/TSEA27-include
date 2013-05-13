@@ -20,32 +20,32 @@ void UART_init()
 	UCSR0B = (1<<RXEN0)|(1<<TXEN0);
 	/* Set frame format: 8data, 1stop bit */
 	UCSR0C = (0<<USBS0)|(3<<UCSZ00);//starta interupts efter handskakning.
-	handshaken = 0;
+	//handshaken = 0;
 
 	/// SÄTT UPP RX-BUFFER
 	cbInit(&_rxMessageBuffer, 100);
 }
 
-uint8_t  UART_handshakeState=0;
+/*uint8_t  UART_handshakeState=0;
 uint16_t  UART_handshakeStateTwoCounter=0;
 void UART_handshake(void)
 {
 	uint8_t svar=0;
 	if(UART_handshakeState==0)
 	{
-		/* Wait for empty transmit buffer */
+		// Wait for empty transmit buffer
 		while (!( UCSR0A & (1<<UDRE0)));
-		/* Put data into buffer, sends the data */
+		// Put data into buffer, sends the data
 		UDR0 = 1;
 		UART_handshakeState++;
 	}
 
 	if(UART_handshakeState==1)
 	{
-		/* Wait for data to be received */
+		// Wait for data to be received
 		if((UCSR0A & (1<<RXC0)))
 		{
-			/* Get and return received data from buffer */
+			// Get and return received data from buffer
 			svar=UDR0;
 			UART_handshakeState++;
 		}
@@ -69,20 +69,36 @@ void UART_handshake(void)
 	}
 	if(UART_handshakeState==3)
 	{
-		/* Wait for empty transmit buffer */
+		// Wait for empty transmit buffer
 		while (!( UCSR0A & (1<<UDRE0)));
-		/* Put data into buffer, sends the data */
+		// Put data into buffer, sends the data
 		UDR0 = 3;
 	}	
+}*/
+
+void UART_writeSyncMessage(){
+	
+	while (!( UCSR0A & (1<<UDRE0)));
+	UDR0 = 255;
+	while (!( UCSR0A & (1<<UDRE0)));
+	UDR0 = 255;
+	while (!( UCSR0A & (1<<UDRE0)));
+	UDR0 = 255;
+	while (!( UCSR0A & (1<<UDRE0)));
+	UDR0 = 255;
+	while (!( UCSR0A & (1<<UDRE0)));
+	UDR0 = 255;
+	while (!( UCSR0A & (1<<UDRE0)));
 }
+
 
 /*
 Skickar meddelandet som ges av msg, byte för byte.
 */
 uint8_t UART_writeMessage(uint8_t* msg, uint8_t type, uint8_t size)
 {
-	if(handshaken)
-	{
+	//if(handshaken)
+	//{
 		/* Wait for empty transmit buffer */
 		while (!( UCSR0A & (1<<UDRE0)));
 			
@@ -98,11 +114,11 @@ uint8_t UART_writeMessage(uint8_t* msg, uint8_t type, uint8_t size)
 			UDR0 = msg[i];
 		}
 		return 1;
-	}
-	else
-	{
-		return 0;
-	}
+	//}
+	//else
+	//{
+	//	return 0;
+	//}
 }
 
 

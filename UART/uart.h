@@ -8,7 +8,10 @@
 CircularBuffer _rxMessageBuffer; // Buffer för mottagna meddelanden
 
 //// PUBLIKA FUNKTIONER
-uint8_t handshaken;
+//uint8_t handshaken;
+
+void UART_writeSyncMessage();
+
 /*
 Sparar ovanstående på skrivbuffern samt startar skrivningen vilken upphör när hela buffern skrivit klart.
 Returnerar 0 för fel, 1 för lyckad sparning.
