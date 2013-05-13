@@ -32,6 +32,6 @@ void UART_init();
 /*
 Handskakar med PCn
 */
-void UART_handshake();
+//void UART_handshake();
 
 #endif
