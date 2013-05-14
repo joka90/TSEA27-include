@@ -13,26 +13,49 @@ typedef struct {
     uint8_t*     bytes;  /* vector of bytes                   */
 } CircularBuffer;
 
-// För att initiera en cirkulär buffer
+/*
+* Initiera och allocera minne för en cirkulärbuffer av storlek size. 
+*/
 void cbInit(volatile CircularBuffer *cb, uint8_t size);
 
+/*
+* Dealocera minnet för den circulära buffern.
+*/
 void cbFree(volatile CircularBuffer *cb);
 
+/*
+* Returnerar 1 om buffern är full 0 om inte.
+*/
 uint8_t cbIsFull(volatile CircularBuffer *cb);
 
+/*
+* Returnerar 1 om buffern är tom 0 om inte.
+*/
 uint8_t cbIsEmpty(volatile CircularBuffer *cb);
 
+/*
+* Returnerar hur många bytes som används i buffern.
+*/
 uint8_t cbBytesUsed(volatile CircularBuffer *cb);
 
+/*
+* Returnerar hur många bytes som är lediga i buffern.
+*/
 uint8_t cbBytesFree(volatile CircularBuffer *cb);
 
+/*
+* Returnerar älsta elementet i buffern utan att ändra på start och slutpekarna.
+*/
 uint8_t cbPeek(volatile CircularBuffer *cb);
 
-/* Write an element, overwriting oldest element if buffer is full. App can
-   choose to avoid the overwrite by checking cbIsFull(). */
+/* 
+ * Skriv en ny byte till buffern. Skriver över för gamla element. Undvik det genom att läsa av cbIsFull innan.
+ */
 void cbWrite(volatile CircularBuffer *cb, uint8_t elem);
 
-/* Read oldest element. App must ensure !cbIsEmpty() first. */
+/*
+ * Returnerar älsta elementet i buffern.
+ */
 uint8_t cbRead(volatile CircularBuffer *cb);
 
 #endif
