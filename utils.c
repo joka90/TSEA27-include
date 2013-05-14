@@ -95,10 +95,15 @@ uint16_t absThreshold(uint16_t a1, uint16_t a2)
     return a1-a2;
   }
 }
-void insertionSort(volatile uint16_t *a, uint8_t array_size)
+void insertionSort(volatile uint16_t *b, uint8_t array_size)
 {
      uint8_t i, j;
 	 uint16_t index;
+	 uint16_t a[array_size];
+	 for(uint8_t n = 0; n < array_size; n++)//copy array before sort.
+	 {
+		 a[n]=b[n];
+	 }
      for (i = 1; i < array_size; ++i)
      {
           index = a[i];
