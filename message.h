@@ -73,6 +73,7 @@
 #define VIRTUAL_REVERSE_COMMAND 5
 #define CUSTOM_STEERING_COMMAND 6
 #define NULL_COMMAND 7
+#define TURN_FINE 8
 #define START 1 
 #define END 0 
 
