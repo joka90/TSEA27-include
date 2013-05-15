@@ -1,11 +1,26 @@
-/*
-Ställer in alla register för att agera som master.
-*/
+﻿/**
+ * TSEA27 Elektronikprojekt
+ *
+ * IDENTIFIERING
+ *
+ * Modul: Sensorenheten
+ * Filnamn: mspi.h
+ * Skriven av: T. Norlund, J. Källström
+ * Datum: 2013-05-15
+ * Version: 1.0
+ *
+ * BESKRIVNING
+ *
+ * Hanterar läsning och skrivning av meddelanden via MSPI
+ */
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
 #include "mspi.h"
 
+/*
+Ställer in alla register för att agera som master.
+*/
 void MSPI_init_master()
 {
 	UBRR1 = 0;
@@ -21,6 +36,7 @@ void MSPI_init_master()
 	*/
 	UBRR1 = 0;
 }
+
 /*
 * Skickar data till slaven och retunerar slavens tidigare data. Dvs det som låg i dess skicka register.
 */

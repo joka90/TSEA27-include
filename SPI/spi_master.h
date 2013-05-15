@@ -1,3 +1,18 @@
+﻿/**
+ * TSEA27 Elektronikprojekt
+ *
+ * IDENTIFIERING
+ *
+ * Modul: Styrenheten
+ * Filnamn: spi_master.h
+ * Skriven av: T. Norlund, J. Källström
+ * Datum: 2013-05-15
+ * Version: 1.0
+ *
+ * BESKRIVNING
+ *
+ * Hanterar läsning och skrivning av meddelanden via SPI för en master
+ */
 #ifndef SPI_MASTER_H
 #define SPI_MASTER_H
 
