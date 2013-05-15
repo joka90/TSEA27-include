@@ -110,8 +110,8 @@ void insertionSort(volatile uint16_t *a, uint8_t array_size)
 }
 uint16_t median(volatile uint16_t *b, uint8_t size)
 {
-	uint16_t a[array_size];
-	for(uint8_t n = 0; n < array_size; n++)//copy array before sort.
+	uint16_t a[size];
+	for(uint8_t n = 0; n < size; n++)//copy array before sort.
 	{
 		a[n]=b[n];
 	}
