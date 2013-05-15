@@ -5,7 +5,7 @@
  *
  * Modul: Sensorenheten
  * Filnamn: mspi.h
- * Skriven av: T. Norlund, J. Källström
+ * Skriven av: T. Norlund, I. Junaeus
  * Datum: 2013-05-15
  * Version: 1.0
  *
