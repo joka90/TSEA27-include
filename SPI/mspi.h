@@ -9,6 +9,9 @@ Ställer in alla register för att agera som master.
 */
 void MSPI_init_master();
 
+/*
+* Skickar data till slaven och retunerar slavens tidigare data. Dvs det som låg i dess skicka register.
+*/
 uint8_t MSPI_exchange(uint8_t data);
 
 #endif

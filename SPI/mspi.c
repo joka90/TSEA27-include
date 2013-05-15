@@ -21,7 +21,9 @@ void MSPI_init_master()
 	*/
 	UBRR1 = 0;
 }
-
+/*
+* Skickar data till slaven och retunerar slavens tidigare data. Dvs det som låg i dess skicka register.
+*/
 uint8_t MSPI_exchange(uint8_t data)
 {
 	/* Wait for empty transmit buffer */
