@@ -1,13 +1,22 @@
-﻿#include "spi_slave.h"
+﻿/**
+ * TSEA27 Elektronikprojekt
+ *
+ * IDENTIFIERING
+ *
+ * Modul: Alla
+ * Filnamn: spi_slave.c
+ * Skriven av: T. Norlund, J. Källström
+ * Datum: 2013-05-15
+ * Version: 1.0
+ *
+ * BESKRIVNING
+ *
+ * Hanterar läsning och skrivning av meddelanden via SPI för en slav
+ */
+
+#include "spi_slave.h"
 #include "../circularbuffer.h"
 
-#define DDR_SPI DDRB
-#define DD_MOSI PB5
-#define DD_MISO PB6
-#define DD_SCK PB7
-
-volatile uint8_t recv_mode=0;
-volatile uint8_t transmit_mode=0;
 volatile uint8_t current_packet_len=0;
 volatile uint8_t current_len;
 volatile CircularBuffer txbuffer;
@@ -20,16 +29,16 @@ Ställer in alla register för att agera som slave.
 void SPI_SLAVE_init()
 {
 	minOneMsgInBuffer = 0;
+	
+	// Initiera rx- och txbuffer
 	cbInit (&txbuffer, SPI_BUFFERSIZE);
 	cbInit (&rxbuffer, SPI_BUFFERSIZE);
-	/* PRR0 = PSPI; // PSI måste vara noll för att enabla SPI modulen*/
-	/* Set MISO output, all others input */
+	
+	// Sätt register
 	DDR_SPI = 0;
 	DDR_SPI = (1<<DD_MISO);
-	/* Enable SPI */
 	SPCR = (1<<SPE)|(1<<SPIE);
-	
-	SPDR = CMD_EXCHANGE_DATA; // Skicka ej redo, om vi inte hunnit handskaka
+	SPDR = CMD_EXCHANGE_DATA;
 }
 
 
@@ -65,7 +74,6 @@ uint8_t SPI_SLAVE_read(uint8_t *msg, uint8_t* type, uint8_t *len)
 	
 	Hållar reda på lite pekare osv på för läsning. så att den inte skriver över saker. signalera om buffer full.
 	rx_start+len pekar på nästa paket efter vi läst ut ett.
-
 	*/
 }
 
@@ -75,13 +83,13 @@ Returnerar 0 för fel, 1 för lyckad sparning.
 */
 uint8_t SPI_SLAVE_write(uint8_t *msg, uint8_t type, uint8_t len)
 {
-	//får paketet plats
+	// Kolla om paketet får plats
 	if(len+1 > cbBytesFree(&txbuffer))
 	{
 		return 0;
 	}
-	cbWrite(&txbuffer, (type<<5)|len);//add header
-	//stoppa in paket i tx buffern
+	cbWrite(&txbuffer, (type<<5)|len); // Lägg in header
+	// Stoppa in paket i tx buffern
 	uint8_t i = 0;
 	while(i < len)
 	{
@@ -96,37 +104,30 @@ uint8_t SPI_SLAVE_write(uint8_t *msg, uint8_t type, uint8_t len)
 }
 
 /*
-http://www.avrfreaks.net/index.php?name=PNphpBB2&file=printview&t=42998&start=0
-When a serial transfer is complete, the SPIF flag is set. An interrupt is generated if SPIE in
-SPCR is set and global interrupts are enabled. If SS is an input and is driven low when the SPI is
-in Master mode, this will also set the SPIF flag. SPIF is cleared by hardware when executing the
-corresponding interrupt handling vector. Alternatively, the SPIF bit is cleared by first reading the
-SPI Status Register with SPIF set, then accessing the SPI Data Register (SPDR). 
-
+ Avbrott för ny byte mottagen/skickad via SPI
 */
 ISR(SPI_STC_vect)
 {
-	volatile uint8_t status = SPIF;//clear interupt bit
+	volatile uint8_t status = SPIF; // Cleara interrupt bit
 	uint8_t data = SPDR;
 	if(data==CMD_EXCHANGE_DATA)
 	{
 		if(cbBytesUsed(&txbuffer) == 0)
 		{
 			minOneMsgInBuffer = 0;
-			SPDR=CMD_EXCHANGE_DATA;//svara att den är tom, detta kommer skrivas över vid SPI_write då en ny överföring görs pga minOneMsgInBuffer ==0
+			SPDR = CMD_EXCHANGE_DATA; // Svara att den är tom, detta kommer skrivas över vid SPI_write då en ny överföring görs pga minOneMsgInBuffer ==0
 		}
-		else if(minOneMsgInBuffer == 1)// Används för att inte läsa ut head medans resterande medelande skrivs in i txbuffern
+		else if(minOneMsgInBuffer == 1) // Används för att inte läsa ut head medans resterande medelande skrivs in i txbuffern
 		{
-			data=cbRead(&txbuffer);//skicka första byten
-			current_packet_len=0b00011111&data;//klipp bort typ
-			SPDR=data;//skicka första byten
-			/* Wait for transmission complete */
-			while(!(SPSR & (1<<SPIF)));//undra om vi måste clera interuptbiten då vi befinner oss i interuptet?
+			data=cbRead(&txbuffer); // Skicka första byten
+			current_packet_len=0b00011111&data; // Klipp bort typ
+			SPDR=data;
+			// Vänta på tom skrivbuffert
+			while(!(SPSR & (1<<SPIF)));
 			current_len=0;
 			while(current_len<current_packet_len)
 			{
-				SPDR=cbRead(&txbuffer);//skicka första byten
-				/* Wait for transmission complete */
+				SPDR=cbRead(&txbuffer);
 				while(!(SPSR & (1<<SPIF)));
 				current_len++;
 			}
@@ -138,20 +139,20 @@ ISR(SPI_STC_vect)
 	}
 	else
 	{
-		//new recive
-		//läs ur längden ur byten, uppdatera räknaren.
-		current_packet_len=0b00011111&data;//klipp bort typ
-		cbWrite(&rxbuffer, data);//spara första byten
+		// Nytt meddelande
+		
+		// Läs ur längden ur byten, uppdatera räknaren.
+		current_packet_len=0b00011111&data; // Klipp bort typ
+		cbWrite(&rxbuffer, data); //Spara headern
 		current_len=0;
 		while(current_len<current_packet_len)
 		{
-			/* Wait for reception complete */
-			while(!(SPSR & (1<<SPIF)))//undra om vi måste clera interuptbiten då vi befinner oss i interuptet?
+			while(!(SPSR & (1<<SPIF)));
 			data = SPDR;
 			cbWrite(&rxbuffer, data);
 			current_len++;
 			SPDR=CMD_EXCHANGE_DATA;
 		}
 	}
-	SPDR=CMD_EXCHANGE_DATA;// För att ifall vi inte hinner till SPI_SLAVE_write, så skicka att vi inte hunnit
+	SPDR=CMD_EXCHANGE_DATA;
 }

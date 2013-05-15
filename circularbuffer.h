@@ -1,10 +1,26 @@
+/**
+ * TSEA27 Elektronikprojekt
+ *
+ * IDENTIFIERING
+ *
+ * Modul: Alla
+ * Filnamn: circularbuffer.h
+ * Skriven av: T. Norlund
+ * Datum: 2013-05-15
+ * Version: 1.0
+ *
+ * BESKRIVNING
+ *
+ * Implementerar en cirkulär buffer, som används för all lagra meddelanden
+ */
+
 #ifndef RINGBUFFER_H
 #define RINGBUFFER_H
 
 #include <stdint.h>
 #include <stdlib.h>
  
-/* Circular buffer object */
+/* Cirkulär buffer (mestadels kopierad från wikipedia) */
 typedef struct {
     uint8_t         size;   /* maximum number of elements           */
     uint8_t         start;  /* index of oldest element              */
@@ -19,7 +35,7 @@ typedef struct {
 void cbInit(volatile CircularBuffer *cb, uint8_t size);
 
 /*
-* Dealocera minnet för den circulära buffern.
+* Deallokera minnet för den circulära buffern.
 */
 void cbFree(volatile CircularBuffer *cb);
 

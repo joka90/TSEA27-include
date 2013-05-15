@@ -1,32 +1,48 @@
+/*
+ * TSEA27 Elektronikprojekt
+ *
+ * IDENTIFIERING
+ *
+ * Modul: Alla
+ * Filnamn: message.c
+ * Skriven av: T. Norlund
+ * Datum: 2013-05-15
+ * Version: 1.0
+ *
+ * BESKRIVNING
+ *
+ * Funktonalitet för att hantera meddelanden som skickas mellan delsystemen
+ */
+
 #ifndef MESSAGE_H
 #define MESSAGE_H
 #include <stdint.h>
 
-//exchange databit 
+// Default
 #define TYPE_CMD_EXCHANGE_DATA        0x07 // 111
 
-//styr skicka
+// Styr skicka
 #define TYPE_REQUEST_SENSOR_DATA 0x00 // 000
 #define TYPE_REQUEST_PC_MESSAGE  0x01 // 001
 #define TYPE_DEBUG_DATA			 0x02 // 010
 #define TYPE_MAP_DATA			 0x03 // 011
 
-//styr taemot
+// Styr taemot
 #define TYPE_SENSOR_DATA		 0x00 // 000
 #define TYPE_MANUAL_COMMAND		 0x05 // 101 , kan ej använda 0x01 001 pga krock
 #define TYPE_CHANGE_PARM		 0x02 // 010
 #define TYPE_NO_PC_MESSAGES		 0x03 // 011
 #define TYPE_EMERGENCY_STOP		 0x04 // 100
 
-
-//sensor taemot
+// Sensor taemot
 #define TYPE_REQUEST_SENSOR_DATA 0x00 // 000
 #define TYPE_CALIBRATE_GYRO		 0x01 // 001
 
-//sensor skicka
+// Sensor skicka
 #define TYPE_REPLY_SENSOR_DATA   0x00 // 000
 #define TYPE_REPLY_CALIBRATE_GYRO 0x01 // 001
 
+// ID
 #define LONGFRONT 0x00
 #define LONGRIGHT 0x01
 #define LONGREAR 0x02
@@ -39,7 +55,7 @@
 #define IDSPEEDRIGHT 0x09
 #define IDSPEEDLEFT 0x0a
 
-//reglerparam
+// Reglerparam
 #define	L1_STRAIGHTX 0x00
 #define L2_STRAIGHTTHETA 0x01
 #define L3_STRAIGHTOMEGA 0x02
@@ -47,7 +63,8 @@
 #define L2_TURNOMEGA 0x04
 #define PARAMRIGHTCUSTOM 0x05
 #define PARAMLEFTCUSTOM 0x06
-//styrkommandon
+
+// Styrkommandon
 #define FORWARD_COMMAND 0
 #define RIGHT_90_COMMAND 1
 #define LEFT_90_COMMAND 2
@@ -59,7 +76,7 @@
 #define START 1 
 #define END 0 
 
-//macros to code/decode messages
+// Makros för att koda/avkoda headern
 #define GET_LEN(x) (x)&0b00011111
 #define SET_LEN(x) (x)
 

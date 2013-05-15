@@ -1,3 +1,18 @@
+/**
+ * TSEA27 Elektronikprojekt
+ *
+ * IDENTIFIERING
+ *
+ * Modul: Alla
+ * Filnamn: message.c
+ * Skriven av: T. Norlund
+ * Datum: 2013-05-15
+ * Version: 1.0
+ *
+ * BESKRIVNING
+ *
+ * Funktonalitet för att hantera meddelanden som skickas mellan delsystemen
+ */
 
 #include "message.h"
 

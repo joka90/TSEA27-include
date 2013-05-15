@@ -1,20 +1,41 @@
+/**
+ * TSEA27 Elektronikprojekt
+ *
+ * IDENTIFIERING
+ *
+ * Modul: Kommunikationsenheten
+ * Filnamn: uart.h
+ * Skriven av: T. Norlund, J. Källström
+ * Datum: 2013-05-15
+ * Version: 1.0
+ *
+ * BESKRIVNING
+ *
+ * Funktonalitet för att kommunicera via UART
+ */
+
 #ifndef UART_H
 #define UART_H
 
 #include "../circularbuffer.h"
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <util/delay.h>
 
 //// PRIVATA (INTERNA) VARIABLER
 ////   -Används ej utanför uart.c
 CircularBuffer _rxMessageBuffer; // Buffer för mottagna meddelanden
 
 //// PUBLIKA FUNKTIONER
-//uint8_t handshaken;
 
+/*
+ Skickar en s.k. synkroniseringssvärm (5 0xFF i rad). Används för att PC:n ska vara
+ säker på att det som kommer därefter är början på ett nytt meddelande
+*/
 void UART_writeSyncMessage();
 
 /*
-Sparar ovanstående på skrivbuffern samt startar skrivningen vilken upphör när hela buffern skrivit klart.
-Returnerar 0 för fel, 1 för lyckad sparning.
+ Skickar meddelandet som ges av msg, byte för byte.
 */
 uint8_t UART_writeMessage(uint8_t* msg, uint8_t type, uint8_t size);
 
@@ -29,9 +50,5 @@ Ställer in alla register samt hastighet för porten.
 */
 void UART_init();
 
-/*
-Handskakar med PCn
-*/
-//void UART_handshake();
 
 #endif

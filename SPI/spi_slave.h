@@ -1,11 +1,30 @@
-﻿#ifndef SPI_SLAVE_H
+﻿/**
+ * TSEA27 Elektronikprojekt
+ *
+ * IDENTIFIERING
+ *
+ * Modul: Alla
+ * Filnamn: spi_slave.h
+ * Skriven av: T. Norlund, J. Källström
+ * Datum: 2013-05-15
+ * Version: 1.0
+ *
+ * BESKRIVNING
+ *
+ * Hanterar läsning och skrivning av meddelanden via SPI för en slav
+ */
+
+#ifndef SPI_SLAVE_H
 #define SPI_SLAVE_H
 
 #include <avr/interrupt.h>
+#include "../../TSEA27-include/circularbuffer.h"
 
-//exchange databit 
 #define CMD_EXCHANGE_DATA        0xE0 // 111 0 0000
-
+#define DDR_SPI DDRB
+#define DD_MOSI PB5
+#define DD_MISO PB6
+#define DD_SCK PB7
 #define SPI_BUFFERSIZE        	 200
 
 #define START 1 

@@ -1,3 +1,19 @@
+/**
+ * TSEA27 Elektronikprojekt
+ *
+ * IDENTIFIERING
+ *
+ * Modul: Alla
+ * Filnamn: utils.c
+ * Skriven av: J. Källström
+ * Datum: 2013-05-15
+ * Version: 1.0
+ *
+ * BESKRIVNING
+ *
+ * Allmänna hjälpfunktioner
+ */
+
 #include "utils.h"
 
 
@@ -13,18 +29,18 @@ uint16_t filterSampleArrayMeanPlusPlus(volatile uint16_t  *samples, uint8_t numO
 		if(absThreshold(samples[i], samples[i+1]) < threshold)
 		{
 			currentNumInRow++;
-			currentSum+=samples[i];//summera
+			currentSum+=samples[i]; // summera
 		}
 	}
 	if(absThreshold(samples[0], samples[numOfSamples-1]) < threshold)
 	{
 		currentNumInRow++;
-		currentSum+=samples[numOfSamples-1];//summera
+		currentSum+=samples[numOfSamples-1]; // summera
 	}
 	if(currentNumInRow!=0)
 	{
 		uint16_t ttt = (uint16_t)(currentSum/currentNumInRow);//return result
-		return ttt;//return result
+		return ttt;
 	}
 	else
 	{

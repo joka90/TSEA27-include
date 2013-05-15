@@ -1,3 +1,19 @@
+/**
+ * TSEA27 Elektronikprojekt
+ *
+ * IDENTIFIERING
+ *
+ * Modul: Alla
+ * Filnamn: utils.h
+ * Skriven av: J. Källström
+ * Datum: 2013-05-15
+ * Version: 1.0
+ *
+ * BESKRIVNING
+ *
+ * Allmänna hjälpfunktioner
+ */
+
 #ifndef UTILS_H
 #define UTILS_H
 /*
