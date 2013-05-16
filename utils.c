@@ -65,7 +65,7 @@ uint16_t filterMeanTimeAware(volatile uint16_t  *samples, uint8_t numOfSamples, 
 	uint8_t spike = 0;
 	while(i < numOfSamples-1)
 	{
-		if(absThreshold(samples[n], samples[n-1]) < threshold)
+		if(absThreshold(samples[n], samples[n-1]) < (samples[n]>>threshold))
 		{
 			currentNumInRow++;
 			currentSum+=samples[n];//summera
@@ -82,7 +82,7 @@ uint16_t filterMeanTimeAware(volatile uint16_t  *samples, uint8_t numOfSamples, 
 			n=numOfSamples-1;
 		}
 	}
-	if((spike==0)&&(absThreshold(samples[start], samples[start+1]) < threshold))//testa sista om vi inte har fått en spike
+	if((spike==0)&&(absThreshold(samples[start], samples[start+1]) < (samples[start]>>threshold)))//testa sista om vi inte har fått en spike
 	{
 		currentNumInRow++;
 		currentSum+=samples[start+1];//summera
