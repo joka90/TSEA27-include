@@ -61,9 +61,9 @@ uint8_t SPI_MASTER_write(uint8_t *msg, uint8_t type, uint8_t len)
 }
 
 
-/*
-Läser direkt. Returnerar 0 för fel, 1 för lyckad läsning.
-*/
+/** 
+ * Läser direkt. Returnerar 0 för fel, 1 för lyckad läsning.
+ */
 uint8_t SPI_MASTER_read(uint8_t *msg, uint8_t* type, uint8_t *len)
 {
 	_delay_us(40);//hur lång tid det tar för att komma till ett interupt?
