@@ -42,9 +42,15 @@ Läser direkt. Returnerar 0 för fel, 1 för lyckad läsning.
 uint8_t SPI_MASTER_read(uint8_t *msg, uint8_t* type, uint8_t *len);
 
 /*
-Väljer enhet som skall vara aktiv på bussen. Denna funktion kommer endast att finnas på styrenheten som är
-master. Styrpinnar för slaveselect kommer vara hårdkodat. */
+Väljer att kommunikationsenheten skall vara aktiv på bussen. Denna funktion kommer endast att finnas på styrenheten som är
+master.
+*/
 void SPI_set_kom(uint8_t t);
+
+/*
+ Väljer att sensorenheten skall vara aktiv på bussen. Denna funktion kommer endast att finnas på styrenheten som är
+ master.
+*/
 void SPI_set_sensor(uint8_t t);
 
 
