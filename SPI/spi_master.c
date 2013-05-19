@@ -23,26 +23,25 @@
 #include <util/delay.h>
 
 /*
-Ställer in alla register för att agera som master.
+ Ställer in alla register för att agera som master.
 */
 void SPI_MASTER_init(void)
 {
-	/* PRR0 = PSPI; // PSI måste vara noll för att enabla SPI modulen*/
 	/* Set MOSI and SCK output, all others input */
 	DDR_SPI = 0;
 	DDR_SPI = (1<<DD_MOSI)|(1<<DD_SCK);
 	
-	//ställ in SS
+	// Ställ in SS
 	DDR_SPI |= (1<<DDB4)|(1<<DDB3);
 	PORTB |= (1<<PB4)|(1<<PB3);// sätt båda slavarna höga
 	
-	/* Enable SPI, Master, set clock rate fck/128 */
+	// Enable SPI, Master, set clock rate fck/128
 	SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR1)|(1<<SPR0);
 }
 
 
 /*
-Skriver direkt. Returnerar 0 för fel, 1 för lyckad sparning.
+ Skriver direkt. Returnerar 0 för fel, 1 för lyckad sparning.
 */
 uint8_t SPI_MASTER_write(uint8_t *msg, uint8_t type, uint8_t len)
 {	
@@ -61,9 +60,9 @@ uint8_t SPI_MASTER_write(uint8_t *msg, uint8_t type, uint8_t len)
 }
 
 
-/*
-Läser direkt. Returnerar 0 för fel, 1 för lyckad läsning.
-*/
+/** 
+ * Läser direkt. Returnerar 0 för fel, 1 för lyckad läsning.
+ */
 uint8_t SPI_MASTER_read(uint8_t *msg, uint8_t* type, uint8_t *len)
 {
 	_delay_us(40);//hur lång tid det tar för att komma till ett interupt?
@@ -97,8 +96,8 @@ uint8_t SPI_MASTER_read(uint8_t *msg, uint8_t* type, uint8_t *len)
 
 
 /*
-Väljer enhet som skall vara aktiv på bussen. Denna funktion kommer endast att finnas på styrenheten som är
-master. Styrpinnar för slaveselect kommer vara hårdkodat.
+Väljer att kommunikationsenheten skall vara aktiv på bussen. Denna funktion kommer endast att finnas på styrenheten som är
+master.
 */
 void SPI_set_kom(uint8_t t)
 {
@@ -112,6 +111,10 @@ void SPI_set_kom(uint8_t t)
 	}
 }
 
+/*
+ Väljer att sensorenheten skall vara aktiv på bussen. Denna funktion kommer endast att finnas på styrenheten som är
+ master.
+*/
 void SPI_set_sensor(uint8_t t)
 {
 	if(t==START)
