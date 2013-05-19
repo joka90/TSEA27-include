@@ -49,7 +49,7 @@ uint16_t filterMeanTimeAware(volatile uint16_t  *samples, uint8_t numOfSamples, 
 * Returnerar absolutbeloppet av differansen av två värden.
 */
 uint16_t absThreshold(uint16_t a1, uint16_t a2);
-
+uint8_t absThreshold8(uint8_t a1, uint8_t a2);
 /*
 * Sorterar array a.
 */

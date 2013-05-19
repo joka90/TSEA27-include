@@ -111,6 +111,19 @@ uint16_t absThreshold(uint16_t a1, uint16_t a2)
     return a1-a2;
   }
 }
+
+uint8_t absThreshold8(uint8_t a1, uint8_t a2)
+{
+  if(a1 < a2)
+  {
+    return a2-a1;
+  }
+  else
+  {
+    return a1-a2;
+  }
+}
+
 void insertionSort(volatile uint16_t *a, uint8_t array_size)
 {
      uint8_t i, j;
